@@ -32,10 +32,14 @@ implementation
 
 {$R *.dfm}
 
+uses About, Main;
+
 procedure TFormSplash.FormCreate(Sender: TObject);
 begin
   StartupTimer.Enabled := False;
-  StartupTimer.Interval := 500;
+  StartupTimer.Interval := 1000;
+  FInitialized := True;
+  Show;
 end;
 
 procedure TFormSplash.FormPaint(Sender: TObject);
@@ -44,20 +48,16 @@ begin
 end;
 
 procedure TFormSplash.LoadMainForm;
-var
-  form, form2: TForm;
 begin
-  form := TMainForm.Create(Application);
-  form.Show;
-  Application.MainForm := form;
+  Application.CreateForm(TMainForm, MainForm);
   Application.CreateForm(TAboutBox, AboutBox);
-
-  Close;
+  Application.Run;
+  FormSplash.Close;
 end;
 
 procedure TFormSplash.StartupTimerTimer(Sender: TObject);
 begin
-  StartupTimer.Enabled := False
+  StartupTimer.Enabled := False;
   if not FInitialized then begin
     FInitialized := True;
     LoadMainForm;

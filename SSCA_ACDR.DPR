@@ -11,8 +11,9 @@ uses
 begin
   Application.Initialize;
   Application.Title := 'SSCA Architectural Control Database';
+  TFormSplash.Create(Application);
 //   Application.CreateForm(TMainForm, MainForm);
 //  Application.CreateForm(TAboutBox, AboutBox);
-  Application.CreateForm(TFormSplash, FormSplash);
+//  Application.CreateForm(TFormSplash, FormSplash);
   Application.Run;
   end.

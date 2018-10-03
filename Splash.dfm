@@ -12,6 +12,7 @@ object FormSplash: TFormSplash
   Font.Name = 'Tahoma'
   Font.Style = []
   OldCreateOrder = False
+  Position = poScreenCenter
   OnCreate = FormCreate
   OnPaint = FormPaint
   PixelsPerInch = 96
@@ -2916,7 +2917,7 @@ object FormSplash: TFormSplash
   object Label1: TLabel
     Left = 88
     Top = 192
-    Width = 369
+    Width = 359
     Height = 18
     Alignment = taCenter
     Caption = 'SSCA Architectural Control Committee Database'
@@ -2934,7 +2935,7 @@ object FormSplash: TFormSplash
     Left = 354
     Top = 372
     Width = 171
-    Height = 16
+    Height = 13
     Alignment = taCenter
     Caption = ' Copyright: Steve Arrieta 2018'
     Color = clBlack
@@ -2951,7 +2952,7 @@ object FormSplash: TFormSplash
     Left = 429
     Top = 386
     Width = 96
-    Height = 16
+    Height = 13
     Alignment = taCenter
     Caption = ' Made in Borland '
     Color = clBlack
@@ -2965,6 +2966,7 @@ object FormSplash: TFormSplash
     Transparent = False
   end
   object StartupTimer: TTimer
+    Interval = 3500
     OnTimer = StartupTimerTimer
     Left = 200
     Top = 120
