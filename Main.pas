@@ -593,6 +593,9 @@ type
     procedure adoTblWelcomeLettersAfterInsert(DataSet: TDataSet);
     procedure ADOQuery1AfterScroll(DataSet: TDataSet);
     procedure adoTblBrowseGenVioLettersAfterScroll(DataSet: TDataSet);
+    procedure adoTableOwnersAfterScroll(DataSet: TDataSet);
+    procedure adoTblAllLettersAfterScroll(DataSet: TDataSet);
+    procedure adoTblMemoToLegalAfterScroll(DataSet: TDataSet);
   private
     procedure SortColumn(DataTable: TADOTable; IndexFieldName: string;
       PushButton: TSpeedButton); overload;
@@ -1482,9 +1485,35 @@ begin
   UpdateCurrentHouseAcct(ADOQuery1.FieldValues['houseAcct']);
 end;
 
+procedure TMainForm.adoTableOwnersAfterScroll(DataSet: TDataSet);
+begin
+  if (adoTableOwners.Active and AdoTableCurrentOwners.Active) then
+    UpdateCurrentHouseAcct(adoTableOwners.FieldValues['houseAcct']);
+end;
+
+procedure TMainForm.adoTblAllLettersAfterScroll(DataSet: TDataSet);
+begin
+  if (adoTblAllLetters.Active and AdoTableCurrentOwners.Active) then begin
+    UpdateCurrentHouseAcct(adoTblAllLetters.FieldValues['houseAcct']);
+    with RichEdit1.Lines do
+      begin
+        Clear;
+        AddStrings(DBMemo14.Lines);
+        VertScrollBar.Position := 0;
+      end;
+    statBarUpdate;
+  end;
+end;
+
 procedure TMainForm.adoTblBrowseGenVioLettersAfterScroll(DataSet: TDataSet);
 begin
   UpdateCurrentHouseAcct(adoTblBrowseGenVioLetters.FieldValues['houseAcct']);
+end;
+
+procedure TMainForm.adoTblMemoToLegalAfterScroll(DataSet: TDataSet);
+begin
+  if (adoTblMemoToLegal.Active and AdoTableCurrentOwners.Active) then
+    UpdateCurrentHouseAcct(adoTblMemoToLegal.FieldValues['houseAcct']);
 end;
 
 procedure TMainForm.adoTblMemoToLegalNewRecord(DataSet: TDataSet);
