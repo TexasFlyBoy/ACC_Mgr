@@ -7,7 +7,7 @@ uses
   Forms, Dialogs, StdCtrls, Buttons, ExtCtrls, Menus, ComCtrls, DB, ADODB,
   Grids, DBGrids, DBCtrls, XPStyleActnCtrls, ActnList, ActnMan, ToolWin,
   ActnCtrls, Access2000, OleServer, DateUtils,
-  RichEdit, Printers, ImgList, Math, System.ImageList;
+  RichEdit, Printers, ImgList, Math, System.ImageList, Registry, Inifiles;
 
 type
   TMainForm = class(TForm)
@@ -52,8 +52,8 @@ type
     adoTblWelcomeLetters: TADOTable;
     dsWelcomeLetters: TDataSource;
     PageControl1: TPageControl;
-    TabSheet1: TTabSheet;
-    TabSheet2: TTabSheet;
+    tsAcAppEntry: TTabSheet;
+    tsViolationEntry: TTabSheet;
     TabSheet3: TTabSheet;
     TabSheet4: TTabSheet;
     TabSheet5: TTabSheet;
@@ -72,7 +72,7 @@ type
     eCurrentAcctSearch: TEdit;
     eCurrentStreetSearch: TEdit;
     eCurrentAddrSearch: TEdit;
-    bdGridCurrentOwners: TDBGrid;
+    dbGridCurrentOwners: TDBGrid;
     dsCurrentOwners: TDataSource;
     AdoTableCurrentOwners: TADOTable;
     sbCurrentOwners: TStatusBar;
@@ -462,6 +462,8 @@ type
     AdoDataSetOwnersmobilePhone1: TWideStringField;
     AdoDataSetOwnersmobilePhone2: TWideStringField;
     dbNavWelcome: TDBNavigator;
+    adoTableOwnersmobilePhone1: TWideStringField;
+    adoTableOwnersmobilePhone2: TWideStringField;
     procedure FormCreate(Sender: TObject);
     procedure ShowHint(Sender: TObject);
     procedure FileNew(Sender: TObject);
@@ -587,12 +589,12 @@ type
     procedure menuCompactDbClick(Sender: TObject);
     procedure eCurrentPhoneSearchChange(Sender: TObject);
     procedure DBGrid2CellClick(Column: TColumn);
-    procedure Button1Click(Sender: TObject);
     procedure PageControl1DrawTab(Control: TCustomTabControl; TabIndex: Integer;
       const Rect: TRect; Active: Boolean);
     procedure adoTblWelcomeLettersAfterInsert(DataSet: TDataSet);
     procedure ADOQuery1AfterScroll(DataSet: TDataSet);
     procedure adoTblBrowseGenVioLettersAfterScroll(DataSet: TDataSet);
+    procedure Button1Click(Sender: TObject);
   private
     procedure SortColumn(DataTable: TADOTable; IndexFieldName: string;
       PushButton: TSpeedButton); overload;
@@ -612,6 +614,19 @@ type
 
   procedure DrawTab( oControl: TCustomTabControl; TabIndex: Integer;
       const Rect: TRect; Active: Boolean);
+  procedure CreateIniFile;
+  function IniFileExists: boolean;
+  function ReadIniString(section, key: string): string overload;
+  function ReadIniBoolean(section, key: string): boolean overload;
+  function ReadIniColor(section, key: string): TColor overload;
+  function ReadIniInteger(section, key: string): integer overload;
+  function ReadIniDouble(section, key: string): double overload;
+  function WriteIniString(section, key, value: string): boolean overload;
+  function WriteIniBoolean(section, key: string; value: boolean): boolean overload;
+  function WriteIniColor(section, key: string; value: TColor): boolean overload;
+  function WriteIniInteger(section, key: string; value: integer): boolean overload;
+  function WriteIniDouble(section, key: string; value: double): boolean overload;
+
 
 var
   MainForm: TMainForm;
@@ -627,8 +642,36 @@ uses
 procedure TMainForm.FormCreate(Sender: TObject);
 begin
   Application.OnHint := ShowHint;
-  ADOConnection1.Connected := True;
-  sbCurrentOwners.Panels[2].Text := ADOConnection1.ConnectionString;
+  if (IniFileExists) then begin
+    try
+      ADOConnection1.ConnectionString := ReadIniString('Connection', 'ConnString');
+    finally
+      // do something here
+    end;
+  // show user if there is a connection
+    if (ADOConnection1.ConnectionString <> '') then begin
+      sbCurrentOwners.Panels[2].Text := ADOConnection1.ConnectionString;
+      ADOConnection1.Connected := True;
+        AdoTableGenVioLetters.Active := True;
+      AdoDataSetOwners.Active := True;
+      adoTblHouses.Active := True;
+      adoTableOwners.Active := True;
+      // adoTblApprovalLetters.Active    := True;
+      adoTblAllApprovalLetters.Active := True;
+      adoTblOffsiteOwners.Active := True;
+      adoTblWelcomeLetters.Active := True;
+      // AdoTableViolationStatus.Active := True;
+      AdoTableCurrentOwners.Active := True;
+      adoTblBrowseGenVioLetters.Active := True;
+      adoTblMemoToLegal.Active := True;
+      adoTblPropInLegal.Active := True;
+      adoTblLegalStatus.Active := True;
+    end else begin
+      sbCurrentOwners.Panels[2].Text := 'Not Connected to Database';
+    end;
+  end else begin
+    sbCurrentOwners.Panels[2].Text := 'Not Connected to Database'
+  end;
   menuLettersSetDefault;
   statBarUpdate;
 end;
@@ -688,6 +731,9 @@ begin
           Exit;
         end;
       end; // try-except
+      WriteIniString('Connection', 'ConnString', ADOConnection1.ConnectionString);
+      sbCurrentOwners.Panels[2].Text := ADOConnection1.ConnectionString;
+     { TODO -ossa -cIniFile :  Add procedure to add Keys to IniFile }
     end
     else
     begin
@@ -1254,6 +1300,35 @@ begin
   else
     PushButton.Tag := 0;
   sortApplicationTable(queryStr);
+end;
+
+{-----------------------------------------------------------
+| Experiment with registry
++-----------------------------------------------------------}
+procedure TMainForm.Button1Click(Sender: TObject);
+var
+  Ini: TIniFile;
+  fileName : string;
+  myFile   : TextFile;
+  data     : string;
+begin
+  CreateIniFile;
+  Exit;
+  fileName := ChangeFileExt( Application.ExeName, '.INI' );
+  if not FileExists(fileName) then begin
+    ShowMessage(fileName + ' does not exist');
+    Ini := TIniFile.Create(fileName);
+    try
+      Ini.WriteInteger( 'Form', 'Top', Top);
+      Ini.WriteInteger( 'Form', 'Left', Left);
+      Ini.WriteString( 'Form', 'Caption', Caption );
+      Ini.WriteBool( 'Form', 'InitMax', WindowState = wsMaximized );
+    finally
+      Ini.Free;
+    end
+  end else begin
+    ShowMessage(fileName +  ' exists');
+  end;
 end;
 
 procedure TMainForm.sbAppLetterSortClick(Sender: TObject);
@@ -2330,10 +2405,10 @@ begin
   // bottomSpacing := 10;
   // gutter := 30;
   margin := 5;
-  bdGridCurrentOwners.Left := margin;
-  bdGridCurrentOwners.Width := pnlCurrentOwners.Width - 2 * margin;
-  bdGridCurrentOwners.Height := pnlCurrentOwners.Height -
-    bdGridCurrentOwners.Top - sbCurrentOwners.Height - margin;
+  dbGridCurrentOwners.Left := margin;
+  dbGridCurrentOwners.Width := pnlCurrentOwners.Width - 2 * margin;
+  dbGridCurrentOwners.Height := pnlCurrentOwners.Height -
+    dbGridCurrentOwners.Top - sbCurrentOwners.Height - margin;
 end;
 
 procedure TMainForm.Connect1Click(Sender: TObject);
@@ -2425,7 +2500,7 @@ begin
     (pnlGenVioLetterEnter.Height - dbGridGenVioLetters.Height -
     dbGridGenVioLetters.Top - 3 * lblGenVioLettersSpecText.Height - 3 *
     memoSpacing - margin) div 3;
-  dbMemoGenVioLettersVioText.Height := dbMemoGenVioLettersSpecText.Height;
+  dbMemoGenVioLettersVioText.Height    := dbMemoGenVioLettersSpecText.Height;
   dbMemoGenVioLettersRemedyText.Height := dbMemoGenVioLettersSpecText.Height;
   // Set the Top of the Memo fields and the associated Labels
   lblGenVioLettersSpecText.Top := dbGridGenVioLetters.Top +
@@ -2491,8 +2566,8 @@ begin
   DBMemo9.Width := DBMemo8.Width;
   DBMemo10.Width := DBMemo8.Width;
   // Set the dbMemo field Height
-  DBMemo8.Height := (dbGridBrowseGenVioLetters.Height -
-    (3 * Label14.Height + 2 * memoSpacing)) div 3;
+  DBMemo8.Height := ((dbGridBrowseGenVioLetters.Height -
+    (3 * Label14.Height + 2 * memoSpacing)) div 3) - 2;
   DBMemo9.Height := DBMemo8.Height;
   DBMemo10.Height := DBMemo8.Height;
   // Set the Top position for the dbMemos and the Labels
@@ -2728,6 +2803,208 @@ begin
   DrawTab(Control, TabIndex, Rect, Active);
 end;
 
+procedure CreateIniFile;
+var
+  Ini: TIniFile;
+  fileName : string;
+  myFile   : TextFile;
+  data     : string;
+begin
+  fileName := ChangeFileExt( Application.ExeName, '.INI' );
+  if FileExists(fileName) then Exit;
+  Ini := TIniFile.Create(fileName);
+  try
+    Ini.WriteString( 'Connection', 'ConnString', '44');
+    Ini.WriteInteger( 'Form', 'Left', 50);
+    Ini.WriteString( 'Form', 'Caption', 'what is going on here' );
+    Ini.WriteFloat('Colors\Panels','pnlCurrentOwners',     $0084B984);
+    Ini.WriteFloat('Colors\Panels','pnlAcAppEnter',        $0061AE0C);
+    Ini.WriteFloat('Colors\Panels','pnlVioStatus',         $00F1A65A);
+    Ini.WriteFloat('Colors\Panels','pnlGenVioLetterEnter', $004798E0);
+    Ini.WriteFloat('Colors\Panels','pnlHousesEnter',       $00DE8B3E);
+    Ini.WriteFloat('Colors\Panels','pnlOwnersEnter',       $00399AE1);
+    Ini.WriteFloat('Colors\Panels','pnlWelcomeEnter',      $0054C622);
+    Ini.WriteFloat('Colors\Panels','pnlAllGenVioLetters',  $004998E0);
+    Ini.WriteFloat('Colors\Panels','pnlAcApps1',           $00D1B499);
+    Ini.WriteFloat('Colors\Panels','pnlAcApps2',           $00D1B499);
+    Ini.WriteFloat('Colors\Panels','pnlGenLetters1',       $00EEC29B);
+    Ini.WriteFloat('Colors\Panels','pnlGenLetters2',       $00EEC29B);
+    Ini.WriteFloat('Colors\Panels','pnlMemoToLegal',       $00FB5942);
+
+
+
+
+    Ini.WriteFloat('Colors','dbGridCurrentOwners',   $00B1D2B0);
+    Ini.WriteFloat('Colors','AC Applications Grid',  $0097F231);
+    Ini.WriteFloat('Colors','Violations Grid',       $00EFD0C9);
+    Ini.WriteFloat('Colors','Current Owners Grid', $00B1D2B0);
+    Ini.WriteFloat('Colors','Current Owners Grid', $00B1D2B0);
+  finally
+    Ini.Free;
+  end
+end;
+
+function IniFileExists: boolean;
+var
+  filename: string;
+begin
+  fileName := ChangeFileExt( Application.ExeName, '.INI' );
+  IniFileExists := FileExists(fileName);
+end;
+
+function ReadIniString(section, key: string): string overload;
+var
+  Ini: TIniFile;
+  fileName, value: string;
+begin
+  ReadIniString := '';
+  filename := ChangeFileExt(Application.ExeName, '.ini');
+  if FileExists(fileName) then begin
+    try
+      Ini := TIniFile.Create(fileName);
+      ReadIniString := Ini.ReadString(section, key, '');
+    finally
+      Ini.Free
+    end;
+  end;
+end;
+
+function ReadIniBoolean(section, key: string): boolean overload;
+var
+  Ini: TIniFile;
+  fileName: string;
+  value: Boolean;
+begin
+  ReadIniBoolean := False;
+  filename := ChangeFileExt(Application.ExeName, '.ini');
+  if FileExists(fileName) then begin
+    try
+      Ini := TIniFile.Create(fileName);
+      ReadIniBoolean := Ini.ReadBool(section, key, False);
+    finally
+      Ini.Free
+    end;
+  end;
+end;
+
+function ReadIniColor(section, key: string): TColor overload;
+var
+  Ini: TIniFile;
+  fileName: string;
+begin
+  ReadIniColor := 0;
+  filename := ChangeFileExt(Application.ExeName, '.ini');
+  if FileExists(fileName) then begin
+    try
+      Ini := TIniFile.Create(fileName);
+      ReadIniColor := Ini.ReadInteger(section, key, 0);
+    finally
+      Ini.Free
+    end;
+  end;
+end;
+
+function ReadIniInteger(section, key: string): integer overload;
+begin
+  ReadIniInteger := ReadIniColor(section, key);
+end;
+
+function ReadIniDouble(section, key: string): double overload;
+var
+  Ini: TIniFile;
+  fileName: string;
+begin
+  ReadIniDouble := 0.0;
+  filename := ChangeFileExt(Application.ExeName, '.ini');
+  if FileExists(fileName) then begin
+    try
+      Ini := TIniFile.Create(fileName);
+      ReadIniDouble := Ini.ReadFloat(section, key, 0.0);
+    finally
+      Ini.Free
+    end;
+  end;
+end;
+
+function WriteIniString(section, key, value: string): boolean overload;
+var
+  Ini: TIniFile;
+  fileName: string;
+begin
+  WriteIniString := False;
+  filename := ChangeFileExt(Application.ExeName, '.ini');
+  if not(FileExists(fileName)) then
+    CreateIniFile;
+  if FileExists(fileName) then begin
+    try
+      Ini := TIniFile.Create(fileName);
+      Ini.WriteString(section, key, value);
+      WriteIniString := True;
+    finally
+      Ini.Free
+    end;
+  end;
+end;
+
+function WriteIniBoolean(section, key: string; value: boolean): boolean overload;
+var
+  Ini: TIniFile;
+  fileName: string;
+begin
+  WriteIniBoolean := False;
+  filename := ChangeFileExt(Application.ExeName, '.ini');
+  if FileExists(fileName) then begin
+    try
+      Ini := TIniFile.Create(fileName);
+      Ini.WriteBool(section, key, value);
+      WriteIniBoolean := True;
+    finally
+      Ini.Free
+    end;
+  end;
+end;
+
+function WriteIniColor(section, key: string; value: TColor): boolean overload;
+var
+  Ini: TIniFile;
+  fileName: string;
+begin
+  WriteIniColor := False;
+  filename := ChangeFileExt(Application.ExeName, '.ini');
+  if FileExists(fileName) then begin
+    try
+      Ini := TIniFile.Create(fileName);
+      Ini.WriteInteger(section, key, value);
+      WriteIniColor := True;
+    finally
+      Ini.Free
+    end;
+  end;
+end;
+
+function WriteIniInteger(section, key: string; value: integer): boolean overload;
+begin
+  WriteIniInteger := WriteIniColor(section, key, value);
+end;
+
+function WriteIniDouble(section, key: string; value: double): boolean overload;
+var
+  Ini: TIniFile;
+  fileName: string;
+begin
+  WriteIniDouble := False;
+  filename := ChangeFileExt(Application.ExeName, '.ini');
+  if FileExists(fileName) then begin
+    try
+      Ini := TIniFile.Create(fileName);
+      Ini.WriteFloat(section, key, value);
+      WriteIniDouble := True;
+    finally
+      Ini.Free
+    end;
+  end;
+end;
+
 procedure DrawTab( oControl: TCustomTabControl; TabIndex: Integer;
 const Rect: TRect; Active: Boolean);
 var
@@ -2812,8 +3089,8 @@ end;
 
 procedure TMainForm.tsAllOwnersEnter(Sender: TObject);
 begin
-  TabSheet1.Highlighted := True;
-  TabSheet1.Font.Style := TabSheet1.Font.Style + [TFontStyle.fsBold];
+  tsAcAppEntry.Highlighted := True;
+  tsAcAppEntry.Font.Style := tsAcAppEntry.Font.Style + [TFontStyle.fsBold];
 end;
 
 procedure TMainForm.tsAllOwnersHide(Sender: TObject);
@@ -2976,11 +3253,6 @@ procedure TMainForm.DBGrid2CellClick(Column: TColumn);
 begin
   eCurrentAcctSearch.Text := adoTableOwners.FieldValues['houseAcct'];
   eCurrentAcctSearchChange(Column);
-end;
-
-procedure TMainForm.Button1Click(Sender: TObject);
-begin
-  ADOTable2.Active := True;
 end;
 
 end.
