@@ -7,7 +7,7 @@ uses
   Forms, Dialogs, StdCtrls, Buttons, ExtCtrls, Menus, ComCtrls, DB, ADODB,
   Grids, DBGrids, DBCtrls, XPStyleActnCtrls, ActnList, ActnMan, ToolWin,
   ActnCtrls, Access2000, OleServer, DateUtils,
-  RichEdit, Printers, ImgList, Math, System.ImageList, Registry, Inifiles;
+  RichEdit, Printers, ImgList, Math, System.ImageList, Registry, Inifiles, all_letters, sql_query;
 
 type
   TMainForm = class(TForm)
@@ -47,17 +47,15 @@ type
     adoTblAllApprovalLetters: TADOTable;
     DataSource2: TDataSource;
     dsAllApprovalLetters: TDataSource;
-    dsOffsiteOwners: TDataSource;
-    adoTblOffsiteOwners: TADOTable;
     adoTblWelcomeLetters: TADOTable;
     dsWelcomeLetters: TDataSource;
-    PageControl1: TPageControl;
+    pcAcApps: TPageControl;
     tsAcAppEntry: TTabSheet;
     tsViolationEntry: TTabSheet;
-    TabSheet3: TTabSheet;
-    TabSheet4: TTabSheet;
-    TabSheet5: TTabSheet;
-    TabSheet6: TTabSheet;
+    tsWelcome: TTabSheet;
+    tsAllVioletters: TTabSheet;
+    tsAllAcApps: TTabSheet;
+    tsLegalStatus: TTabSheet;
     pnlCurrentOwners: TPanel;
     pnlAllOwners: TPanel;
     Label1: TLabel;
@@ -150,7 +148,7 @@ type
     sbAppApplyDateSort: TSpeedButton;
     sbAppMonthSort: TSpeedButton;
     sbAppYearSort: TSpeedButton;
-    DBNavigator1: TDBNavigator;
+    dbnavAllAcApps: TDBNavigator;
     adoTblPropInLegal: TADOTable;
     adoTblLegalStatus: TADOTable;
     DBGrid4: TDBGrid;
@@ -161,10 +159,10 @@ type
     DBMemo13: TDBMemo;
     PopupMenu1: TPopupMenu;
     DeleteRecord1: TMenuItem;
-    DBNavigator3: TDBNavigator;
-    DBNavigator2: TDBNavigator;
-    DBNavigator4: TDBNavigator;
-    DBNavigator5: TDBNavigator;
+    dbnavGenVioLetters: TDBNavigator;
+    dbnavViolations: TDBNavigator;
+    dbnavVioStatus: TDBNavigator;
+    dbnavAcAppEntry: TDBNavigator;
     lblAcApplications: TLabel;
     sbLegalSort: TSpeedButton;
     sbOffsiteSort: TSpeedButton;
@@ -172,8 +170,8 @@ type
     adoTableViolationStatus: TADOTable;
     sbNextVioLetter: TSpeedButton;
     Close1: TMenuItem;
-    TabSheet7: TTabSheet;
-    DBGrid8: TDBGrid;
+    tsGenLetters: TTabSheet;
+    dbGridAllLetters: TDBGrid;
     adoTblAllLetters: TADOTable;
     DataSource4: TDataSource;
     adoQryClearLetters: TADOQuery;
@@ -181,7 +179,7 @@ type
     openDlgSql: TOpenDialog;
     btnOpenSql: TButton;
     btnSaveLetter: TButton;
-    adoTblAllLettershouseAcct: TIntegerField;
+{    adoTblAllLettershouseAcct: TIntegerField;
     adoTblAllLetterslegal: TWideStringField;
     adoTblAllLettersletterType: TWideStringField;
     adoTblAllLettersacctSectionLine: TWideStringField;
@@ -223,6 +221,7 @@ type
     adoTblAllLetterswhoFrom: TWideStringField;
     adoTblAllLetterssellDate: TDateTimeField;
     adoTblAllLettersletterBody: TMemoField;
+}
     FontDialog1: TFontDialog;
     btnFont: TButton;
     DBMemo14: TDBMemo;
@@ -235,21 +234,21 @@ type
     sbDate: TSpeedButton;
     sbOrigLetterDate: TSpeedButton;
     sbLetterType: TSpeedButton;
-    TabSheet8: TTabSheet;
+    tsMemo2Legal: TTabSheet;
     adoTblMemoToLegal: TADOTable;
     DBGrid1: TDBGrid;
     dsMemoToLegal: TDataSource;
-    DBNavigator6: TDBNavigator;
+    dbnavMemo2Legal: TDBNavigator;
     ImageList1: TImageList;
-    SpeedButton1: TSpeedButton;
-    SpeedButton2: TSpeedButton;
-    SpeedButton3: TSpeedButton;
-    SpeedButton8: TSpeedButton;
-    SpeedButton9: TSpeedButton;
-    SpeedButton10: TSpeedButton;
-    SpeedButton11: TSpeedButton;
-    SpeedButton12: TSpeedButton;
-    SpeedButton13: TSpeedButton;
+    sbAcctSort_memo2Legal: TSpeedButton;
+    sbMemoSort_memo2Legal: TSpeedButton;
+    sbVoteSort_memo2Legal: TSpeedButton;
+    sbAcctSort_GenLetters: TSpeedButton;
+    sbVioSort_GenLetters: TSpeedButton;
+    sbDateSort_GenLetters: TSpeedButton;
+    sbTypeSort_GenLetters: TSpeedButton;
+    sbOwnerSort_GenLetters: TSpeedButton;
+    sbAddressSort_GenLetters: TSpeedButton;
     dbMemoAcAppRejectWords: TDBMemo;
     dbMemoAcAppRemedyWords: TDBMemo;
     lblAcAppSpecAppWords: TLabel;
@@ -267,7 +266,7 @@ type
     btnVioStatus: TButton;
     adoVioQry: TADOQuery;
     dsVioQry: TDataSource;
-    SpeedButton16: TSpeedButton;
+    sbPermitSort_GenLetters: TSpeedButton;
     adoVioQryviolationID: TAutoIncField;
     adoVioQryacctID: TIntegerField;
     adoVioQryhouseAcct: TIntegerField;
@@ -285,10 +284,10 @@ type
     AdoDataSetVioStatus: TADODataSet;
     DataSource6: TDataSource;
     AdoDataSetVioLetters: TADODataSet;
-    DataSource5: TDataSource;
+    dsSetGenVioLetters: TDataSource;
     adoQryRunLetters: TADOQuery;
     btnRunLetters: TButton;
-    SpeedButton14: TSpeedButton;
+    sbNumSort_GenLetters: TSpeedButton;
     menuLetters: TMenuItem;
     menuLetters7Days: TMenuItem;
     menuLetters2Weeks: TMenuItem;
@@ -306,9 +305,9 @@ type
     N6: TMenuItem;
     menuLetters2Days: TMenuItem;
     menuLetters3Days: TMenuItem;
-    TabSheet9: TTabSheet;
+    tsReports: TTabSheet;
     sbViolations: TStatusBar;
-    StatusBar2: TStatusBar;
+    sbVioStatus: TStatusBar;
     Splitter1: TSplitter;
     Connect1: TMenuItem;
     N7: TMenuItem;
@@ -346,8 +345,8 @@ type
     AdoDataAllAppLetters: TADODataSet;
     dbNavOwners: TDBNavigator;
     tsAllOwners: TTabSheet;
-    DBGrid2: TDBGrid;
-    StatusBar1: TStatusBar;
+    dbgridAllOwners: TDBGrid;
+    sbAllOwners: TStatusBar;
     adoTableOwners: TADOTable;
     dsAllOwners: TDataSource;
     ColorDialog1: TColorDialog;
@@ -456,7 +455,7 @@ type
     ADOTable2: TADOTable;
     Button1: TButton;
     adoTblHousesdriveRoute: TFloatField;
-    DBNavigator7: TDBNavigator;
+    dbnavLegalStatUpdate: TDBNavigator;
     AdoTableCurrentOwnersmobilePhone1: TWideStringField;
     AdoTableCurrentOwnersmobilePhone2: TWideStringField;
     AdoDataSetOwnersmobilePhone1: TWideStringField;
@@ -464,6 +463,17 @@ type
     dbNavWelcome: TDBNavigator;
     adoTableOwnersmobilePhone1: TWideStringField;
     adoTableOwnersmobilePhone2: TWideStringField;
+    tsSqlViewer: TTabSheet;
+    pnlSqlButtons: TPanel;
+    Label6: TLabel;
+    btnRunSql: TButton;
+    btnShowSql: TButton;
+    pnlSqlText: TPanel;
+    Panel1: TPanel;
+    Splitter6: TSplitter;
+    memoSqlText: TMemo;
+    dbGridSqlView: TDBGrid;
+    sbSqlView: TStatusBar;
     procedure FormCreate(Sender: TObject);
     procedure ShowHint(Sender: TObject);
     procedure FileNew(Sender: TObject);
@@ -517,7 +527,7 @@ type
     procedure btnOpenSqlClick(Sender: TObject);
     procedure btnSaveLetterClick(Sender: TObject);
     procedure btnFontClick(Sender: TObject);
-    procedure DBGrid8CellClick(Column: TColumn);
+    procedure dbGridAllLettersCellClick(Column: TColumn);
     procedure sbVioNumClick(Sender: TObject);
     procedure sbAcctNumClick(Sender: TObject);
     procedure sbLetterNumClick(Sender: TObject);
@@ -527,24 +537,17 @@ type
     procedure dbGridBrowseGenVioLettersCellClick(Column: TColumn);
     procedure DBGrid3CellClick(Column: TColumn);
     procedure adoTblMemoToLegalNewRecord(DataSet: TDataSet);
-    procedure SpeedButton1Click(Sender: TObject);
-    procedure SpeedButton2Click(Sender: TObject);
-    procedure SpeedButton3Click(Sender: TObject);
+    procedure sbAcctSort_memo2LegalClick(Sender: TObject);
+    procedure sbMemoSort_memo2LegalClick(Sender: TObject);
+    procedure sbVoteSort_memo2LegalClick(Sender: TObject);
     procedure DBGrid1CellClick(Column: TColumn);
     procedure BuildSortAppTableQuery(IndexFieldName: string;
       PushButton: TSpeedButton);
     procedure GenerateLetterButtonClear;
-    procedure SpeedButton8Click(Sender: TObject);
-    procedure SpeedButton9Click(Sender: TObject);
-    procedure SpeedButton10Click(Sender: TObject);
-    procedure SpeedButton11Click(Sender: TObject);
-    procedure SpeedButton12Click(Sender: TObject);
-    procedure SpeedButton13Click(Sender: TObject);
     procedure sbWelcomeCloseClick(Sender: TObject);
     procedure sbWelcomeIdClick(Sender: TObject);
     procedure sbWelcomeOwnerClick(Sender: TObject);
     procedure btnVioStatusClick(Sender: TObject);
-    procedure SpeedButton16Click(Sender: TObject);
     procedure AdoTableCurrentOwnersAfterScroll(DataSet: TDataSet);
     procedure AdoDataSetViolationsAfterScroll(DataSet: TDataSet);
     procedure AdoDataSetVioStatusAfterInsert(DataSet: TDataSet);
@@ -554,7 +557,6 @@ type
     procedure AdoDataSetViolationsAfterPost(DataSet: TDataSet);
     procedure AdoDataSetVioStatusAfterPost(DataSet: TDataSet);
     procedure btnRunLettersClick(Sender: TObject);
-    procedure SpeedButton14Click(Sender: TObject);
     procedure menuLettersClick(Sender: TObject);
     procedure menuLettersUncheck;
     procedure menuLettersSetDefault;
@@ -576,25 +578,32 @@ type
     procedure pnlWelcomeEnterResize(Sender: TObject);
     procedure pnlGenLetters2Resize(Sender: TObject);
     procedure pnlGenLetters1Resize(Sender: TObject);
-    procedure TabSheet7Resize(Sender: TObject);
+    procedure tsGenLettersResize(Sender: TObject);
     procedure pnlAcApps2Resize(Sender: TObject);
     procedure pnlMemoToLegalResize(Sender: TObject);
     procedure AdoDataSetOwnersAfterInsert(DataSet: TDataSet);
     procedure AdoDataSetOwnersAfterPost(DataSet: TDataSet);
-    procedure PageControl1Change(Sender: TObject);
+    procedure pcAcAppsChange(Sender: TObject);
     procedure SpeedButton5Click(Sender: TObject);
     procedure tsAllOwnersResize(Sender: TObject);
     procedure tsAllOwnersEnter(Sender: TObject);
     procedure tsAllOwnersHide(Sender: TObject);
     procedure menuCompactDbClick(Sender: TObject);
     procedure eCurrentPhoneSearchChange(Sender: TObject);
-    procedure DBGrid2CellClick(Column: TColumn);
-    procedure PageControl1DrawTab(Control: TCustomTabControl; TabIndex: Integer;
+    procedure pcAcAppsDrawTab(Control: TCustomTabControl; TabIndex: Integer;
       const Rect: TRect; Active: Boolean);
     procedure adoTblWelcomeLettersAfterInsert(DataSet: TDataSet);
     procedure ADOQuery1AfterScroll(DataSet: TDataSet);
     procedure adoTblBrowseGenVioLettersAfterScroll(DataSet: TDataSet);
     procedure Button1Click(Sender: TObject);
+    procedure DBGrid2DblClick(Sender: TObject);
+    procedure dbgridAllOwnersCellClick(Column: TColumn);
+    procedure btnRunSqlClick(Sender: TObject);
+    procedure btnShowSqlClick(Sender: TObject);
+//    procedure btnRunSqlClick(Sender: TObject);
+//    procedure btnShowSqlClick(Sender: TObject);
+    procedure sbSort_GenLettersClick(Sender: TObject);
+
   private
     procedure SortColumn(DataTable: TADOTable; IndexFieldName: string;
       PushButton: TSpeedButton); overload;
@@ -608,26 +617,31 @@ type
     procedure JroRefreshCache(ADOConnection: TADOConnection);
     procedure JroCompactDatabase(const Source, Destination: string);
     procedure UpdateCurrentHouseAcct(newHouseAcct: string);
-
+    procedure SortColumnMod(DataSet: TADODataSet; IndexFieldName: string;
+      PushButton: TSpeedButton); overload;
+    procedure SortColumnMod(DataTable: TADOTable; IndexFieldName: string;
+      PushButton: TSpeedButton); overload;
 
   end;
 
-  procedure DrawTab( oControl: TCustomTabControl; TabIndex: Integer;
-      const Rect: TRect; Active: Boolean);
-  procedure CreateIniFile;
-  function IniFileExists: boolean;
-  function ReadIniString(section, key: string): string overload;
-  function ReadIniBoolean(section, key: string): boolean overload;
-  function ReadIniColor(section, key: string): TColor overload;
-  function ReadIniInteger(section, key: string): integer overload;
-  function ReadIniDouble(section, key: string): double overload;
-  function WriteIniString(section, key, value: string): boolean overload;
-  function WriteIniBoolean(section, key: string; value: boolean): boolean overload;
-  function WriteIniColor(section, key: string; value: TColor): boolean overload;
-  function WriteIniInteger(section, key: string; value: integer): boolean overload;
-  function WriteIniDouble(section, key: string; value: double): boolean overload;
-
-
+procedure DrawTab(oControl: TCustomTabControl; TabIndex: Integer;
+  const Rect: TRect; Active: Boolean);
+// procedure CreateIniFile;
+{
+function IniFileExists: Boolean;
+function ReadIniString(section, key: string): string overload;
+function ReadIniBoolean(section, key: string): Boolean overload;
+function ReadIniColor(section, key: string): TColor overload;
+function ReadIniInteger(section, key: string): Integer overload;
+function ReadIniDouble(section, key: string): double overload;
+function WriteIniString(section, key, value: string): Boolean overload;
+function WriteIniBoolean(section, key: string; value: Boolean)
+  : Boolean overload;
+function WriteIniColor(section, key: string; value: TColor): Boolean overload;
+function WriteIniInteger(section, key: string; value: Integer)
+  : Boolean overload;
+function WriteIniDouble(section, key: string; value: double): Boolean overload;
+}
 var
   MainForm: TMainForm;
   LetterDate: Tdate;
@@ -635,42 +649,43 @@ var
 implementation
 
 uses
-  about, Variants, StrUtils, Types, ComObj, System.UITypes;
+  about, Variants, StrUtils, Types, ComObj, System.UITypes, ini_file,
+  all_owners, SplashScreen, AccDb;
 
 {$R *.dfm}
 
 procedure TMainForm.FormCreate(Sender: TObject);
 begin
   Application.OnHint := ShowHint;
-  if (IniFileExists) then begin
+  if (IniFileExists) then
+  begin
     try
-      ADOConnection1.ConnectionString := ReadIniString('Connection', 'ConnString');
-    finally
-      // do something here
+      ADOConnection1.Connected := False;
+      ADOConnection1.ConnectionString := ReadIniString('Connection',
+        'ConnString');
+    except
+      ShowMessage('Cannot reconnect to database.'
+             + ' You will have to manually connect to the database.');
+      MakeConnection(False);
+      ADOConnection1.ConnectionString := '';
     end;
-  // show user if there is a connection
-    if (ADOConnection1.ConnectionString <> '') then begin
+    // show user if there is a connection
+    if (ADOConnection1.ConnectionString <> '') then
+    begin
+      SplashScn.stReconnect.Visible := True;
       sbCurrentOwners.Panels[2].Text := ADOConnection1.ConnectionString;
-      ADOConnection1.Connected := True;
-        AdoTableGenVioLetters.Active := True;
-      AdoDataSetOwners.Active := True;
-      adoTblHouses.Active := True;
-      adoTableOwners.Active := True;
-      // adoTblApprovalLetters.Active    := True;
-      adoTblAllApprovalLetters.Active := True;
-      adoTblOffsiteOwners.Active := True;
-      adoTblWelcomeLetters.Active := True;
-      // AdoTableViolationStatus.Active := True;
-      AdoTableCurrentOwners.Active := True;
-      adoTblBrowseGenVioLetters.Active := True;
-      adoTblMemoToLegal.Active := True;
-      adoTblPropInLegal.Active := True;
-      adoTblLegalStatus.Active := True;
-    end else begin
+      MakeConnection(True);
+    end
+    else
+    begin
       sbCurrentOwners.Panels[2].Text := 'Not Connected to Database';
+      MakeConnection(False);
     end;
-  end else begin
-    sbCurrentOwners.Panels[2].Text := 'Not Connected to Database'
+  end
+  else
+  begin
+    sbCurrentOwners.Panels[2].Text := 'Not Connected to Database';
+    MakeConnection(False);
   end;
   menuLettersSetDefault;
   statBarUpdate;
@@ -731,9 +746,10 @@ begin
           Exit;
         end;
       end; // try-except
-      WriteIniString('Connection', 'ConnString', ADOConnection1.ConnectionString);
+      WriteIniString('Connection', 'ConnString',
+        ADOConnection1.ConnectionString);
       sbCurrentOwners.Panels[2].Text := ADOConnection1.ConnectionString;
-     { TODO -ossa -cIniFile :  Add procedure to add Keys to IniFile }
+      { TODO -ossa -cIniFile :  Add procedure to add Keys to IniFile }
     end
     else
     begin
@@ -741,23 +757,9 @@ begin
       raise Exception.Create('File does not exist.');
       Exit
     end;
+
   { Success - now open the connection and connect the tables }
-  // AdoTableViolations.Active       := True;
-  AdoTableGenVioLetters.Active := True;
-  AdoDataSetOwners.Active := True;
-  adoTblHouses.Active := True;
-  adoTableOwners.Active := True;
-  // adoTblApprovalLetters.Active    := True;
-  adoTblAllApprovalLetters.Active := True;
-  adoTblOffsiteOwners.Active := True;
-  adoTblWelcomeLetters.Active := True;
-  // AdoTableViolationStatus.Active := True;
-  AdoTableCurrentOwners.Active := True;
-  adoTblBrowseGenVioLetters.Active := True;
-  adoTblMemoToLegal.Active := True;
-  adoTblPropInLegal.Active := True;
-  adoTblLegalStatus.Active := True;
-  // ShowMessage(ADOConnection1.ConnectionString);
+    MakeConnection(True);
 end;
 
 procedure TMainForm.FileSave(Sender: TObject);
@@ -861,8 +863,8 @@ end;
 
 procedure TMainForm.frmCurrentOwners21DbGridCurrentOwnersDblClick
   (Sender: TObject);
-//var
-//  filterHouseAcct: integer;
+// var
+// filterHouseAcct: integer;
 begin
   { filterHouseAcct := AdoTableCurrentOwners.FieldValues['houseAcct'];
     AdoTableCurrentOwners.Filtered := false;
@@ -884,7 +886,7 @@ end;
   +----------------------------------------------------------------------- }
 procedure TMainForm.TEditChange(filterText: string);
 var
-  numOfRecords: integer;
+  numOfRecords: Integer;
 begin
   if (length(filterText) = 0) then
   begin
@@ -903,9 +905,9 @@ begin
   numOfRecords := AdoTableCurrentOwners.RecordCount;
   sbCurrentOwners.Panels[1].Text := 'Record Count: ' + IntToStr(numOfRecords);
 
-  StatusBar1.Panels[0].Text := filterText;
+  sbAllOwners.Panels[0].Text := filterText;
   numOfRecords := adoTableOwners.RecordCount;
-  StatusBar1.Panels[1].Text := 'Record Count: ' + IntToStr(numOfRecords);
+  sbAllOwners.Panels[1].Text := 'Record Count: ' + IntToStr(numOfRecords);
 end;
 
 { ----------------------------------------------------------------------+
@@ -951,15 +953,15 @@ end;
 
 procedure TMainForm.sbCopyGenVioLetterClick(Sender: TObject);
 var
-  vinNumber: integer;
+  vinNumber: Integer;
 begin
   vinNumber := dsGenVioLetters.DataSet.FieldValues['violationId'];
-  ShowMessage('VinNumber = ' + IntToStr(vinNumber));
+//  ShowMessage('VinNumber = ' + IntToStr(vinNumber));
 end;
 
 procedure TMainForm.sbAcctSortClick(Sender: TObject);
 var
-  numOfRecords: integer;
+  numOfRecords: Integer;
 begin
   AdoTableCurrentOwners.Filtered := False;
   adoTableOwners.Filtered := False;
@@ -987,12 +989,12 @@ begin
 
   adoTableOwners.Filtered := True;
   numOfRecords := adoTableOwners.RecordCount;
-  StatusBar1.Panels[1].Text := 'Record Count: ' + IntToStr(numOfRecords);
+  sbAllOwners.Panels[1].Text := 'Record Count: ' + IntToStr(numOfRecords);
 end;
 
 procedure TMainForm.sbOwnerSortClick(Sender: TObject);
 var
-  numOfRecords: integer;
+  numOfRecords: Integer;
 begin
   AdoTableCurrentOwners.Filtered := False;
   AdoTableCurrentOwners.IndexFieldNames := 'Owner';
@@ -1004,12 +1006,12 @@ begin
   adoTableOwners.IndexFieldNames := 'Owner';
   adoTableOwners.Filtered := True;
   numOfRecords := adoTableOwners.RecordCount;
-  StatusBar1.Panels[1].Text := 'Record Count: ' + IntToStr(numOfRecords);
+  sbAllOwners.Panels[1].Text := 'Record Count: ' + IntToStr(numOfRecords);
 end;
 
 procedure TMainForm.sbStrNumSortClick(Sender: TObject);
 var
-  numOfRecords: integer;
+  numOfRecords: Integer;
 begin
   AdoTableCurrentOwners.Filtered := False;
   if (sbStrNumSort.Tag = 1) then
@@ -1033,7 +1035,7 @@ end;
 
 procedure TMainForm.sbStrNameSortClick(Sender: TObject);
 var
-  numOfRecords: integer;
+  numOfRecords: Integer;
 begin
   AdoTableCurrentOwners.Filtered := False;
   AdoTableCurrentOwners.IndexFieldNames := 'streetName';
@@ -1044,7 +1046,7 @@ end;
 
 procedure TMainForm.eOwnersOwnerOnChange(Sender: TObject);
 var
-  numOfRecords: integer;
+  numOfRecords: Integer;
 begin
   // First we ignore the wildcard as the first character
   if (eCurrentOwnerSearch.Text = '%') then
@@ -1074,9 +1076,9 @@ begin
   numOfRecords := AdoTableCurrentOwners.RecordCount;
   sbCurrentOwners.Panels[1].Text := 'Record Count: ' + IntToStr(numOfRecords);
 
-  StatusBar1.Panels[0].Text := 'Any ' + AdoTableCurrentOwners.Filter;
+  sbAllOwners.Panels[0].Text := 'Any ' + AdoTableCurrentOwners.Filter;
   numOfRecords := adoTableOwners.RecordCount;
-  StatusBar1.Panels[1].Text := 'Record Count: ' + IntToStr(numOfRecords);
+  sbAllOwners.Panels[1].Text := 'Record Count: ' + IntToStr(numOfRecords);
 end;
 
 { ----------------------------------------------------------------------+
@@ -1092,7 +1094,7 @@ end;
   +----------------------------------------------------------------------- }
 procedure TMainForm.sbApproveApplicationClick(Sender: TObject);
 var
-  myHouseAcct: integer;
+  myHouseAcct: Integer;
 begin
   myHouseAcct := dsCurrentOwners.DataSet.FieldValues['houseAcct'];
   with AdoDataAllAppLetters do
@@ -1114,26 +1116,29 @@ end;
 { ----------------------------------------------------------------------+
   sbNewVioLetterClick:
   This is a procedure to append a new record to the GenVioLetters
-  table. Several fields are populated:
+  table.
 
-  letterDate    : Today's date
-  letterType    : GEN (for generic)
-  letterNumber  : FOL (First Office Letter)
-  senderInitials: BOZO
-  Memo Fields   : names of the fields
+  The following field's initial value is hard coded:
+      letterDate    : Today's date
+
+  The following fields are populated with values from the INI file
+      letterType
+      letterNumber
+      senderInitials
+      Memo Fields
   +----------------------------------------------------------------------- }
 procedure TMainForm.sbNewVioLetterClick(Sender: TObject);
 begin
   with AdoDataSetVioLetters do
   begin
     Append;
-    FieldByName('letterDate').Value := Date; // Today's Date
-    FieldValues['letterType'] := 'GEN';
-    FieldByName('letterNumber').Value := 'FOL';
-    FieldValues['specificViolationTitle'] := 'Specific Violation Title';
-    FieldValues['textViolationWords'] := 'Text Violation Words';
-    FieldValues['remedyWords'] := 'Remedy Words';
-    FieldValues['senderInitials'] := 'Bozo';
+    FieldByName('letterDate').value := Date; // Today's Date
+    FieldValues['letterType'] := ReadIniString('VioLetters\Defaults','letterType');
+    FieldByName('letterNumber').value := ReadIniString('VioLetters\Defaults','letterNumber');
+    FieldValues['specificViolationTitle'] := ReadIniString('VioLetters\Defaults','specificViolationTitle');
+    FieldValues['textViolationWords'] := ReadIniString('VioLetters\Defaults','textViolationWords');
+    FieldValues['remedyWords'] := ReadIniString('VioLetters\Defaults','remedyWords');
+    FieldValues['senderInitials'] := ReadIniString('VioLetters\Defaults','senderInitials');
   end;
 end;
 
@@ -1142,6 +1147,8 @@ end;
   This is a procedure to append a new record the GenVioLetters
   table which is the next letter in the series to the letter in the
   current record.
+
+  Several values are taken from the INI file.
   +----------------------------------------------------------------------- }
 procedure TMainForm.sbNextVioLetterClick(Sender: TObject);
 var
@@ -1177,9 +1184,13 @@ begin
   else
     newLetterNumber := '';
 
-  // 3OL needs the signatureLine field to be populated, so set default value
+  // 3OL+ need the signatureLine field to be populated, so set default value
   if (oldLetterNumber = '2OL') then
-    oldSignLine := 'Bozo D. Clown';
+    oldSignLine := ReadIniString('VioLetters\Defaults','3OLSignLine')
+  else if (oldLetterNumber = '3OL') then
+    oldSignLine := ReadIniString('VioLetters\Defaults','4OLSignLine')
+  else if (oldLetterNumber = '4OL') then
+    oldSignLine := ReadIniString('VioLetters\Defaults','209SignLine');
 
   // Append a new record and populate the fields
   with AdoDataSetVioLetters do
@@ -1302,34 +1313,38 @@ begin
   sortApplicationTable(queryStr);
 end;
 
-{-----------------------------------------------------------
-| Experiment with registry
-+-----------------------------------------------------------}
+{ -----------------------------------------------------------
+  | Experiment with registry
+  +----------------------------------------------------------- }
 procedure TMainForm.Button1Click(Sender: TObject);
 var
   Ini: TIniFile;
-  fileName : string;
-  myFile   : TextFile;
-  data     : string;
+  FileName: string;
+  myFile: TextFile;
+  data: string;
 begin
   CreateIniFile;
   Exit;
-  fileName := ChangeFileExt( Application.ExeName, '.INI' );
-  if not FileExists(fileName) then begin
-    ShowMessage(fileName + ' does not exist');
-    Ini := TIniFile.Create(fileName);
+  FileName := ChangeFileExt(Application.ExeName, '.INI');
+  if not FileExists(FileName) then
+  begin
+    ShowMessage(FileName + ' does not exist');
+    Ini := TIniFile.Create(FileName);
     try
-      Ini.WriteInteger( 'Form', 'Top', Top);
-      Ini.WriteInteger( 'Form', 'Left', Left);
-      Ini.WriteString( 'Form', 'Caption', Caption );
-      Ini.WriteBool( 'Form', 'InitMax', WindowState = wsMaximized );
+      Ini.WriteInteger('Form', 'Top', Top);
+      Ini.WriteInteger('Form', 'Left', Left);
+      Ini.WriteString('Form', 'Caption', Caption);
+      Ini.WriteBool('Form', 'InitMax', WindowState = wsMaximized);
     finally
       Ini.Free;
     end
-  end else begin
-    ShowMessage(fileName +  ' exists');
+  end
+  else
+  begin
+    ShowMessage(FileName + ' exists');
   end;
 end;
+
 
 procedure TMainForm.sbAppLetterSortClick(Sender: TObject);
 begin
@@ -1368,7 +1383,7 @@ end;
 
 procedure TMainForm.sbLegalSortClick(Sender: TObject);
 var
-  numOfRecords: integer;
+  numOfRecords: Integer;
 begin
   AdoTableCurrentOwners.Filtered := False;
   AdoTableCurrentOwners.IndexFieldNames := 'legal';
@@ -1379,7 +1394,7 @@ end;
 
 procedure TMainForm.sbOffsiteSortClick(Sender: TObject);
 var
-  numOfRecords: integer;
+  numOfRecords: Integer;
 begin
   AdoTableCurrentOwners.Filtered := False;
   AdoTableCurrentOwners.IndexFieldNames := 'offsite';
@@ -1391,12 +1406,33 @@ begin
   adoTableOwners.IndexFieldNames := 'offsite';
   adoTableOwners.Filtered := True;
   numOfRecords := adoTableOwners.RecordCount;
-  StatusBar1.Panels[1].Text := 'Record Count: ' + IntToStr(numOfRecords);
+  sbAllOwners.Panels[1].Text := 'Record Count: ' + IntToStr(numOfRecords);
 end;
 
 procedure TMainForm.Close1Click(Sender: TObject);
 begin
   ADOConnection1.Connected := False;
+    // AdoTableViolations.Active       := False;
+  AdoTableGenVioLetters.Active := False;
+  AdoDataSetOwners.Active := False;
+  adoTblHouses.Active := False;
+{  ShowMessage('FileOpen1: here we are BEFORE 779');
+  if (AllOwnersOpen) then
+    AllOwnersColumnSetup;
+  ShowMessage('FileOpen1: here we are at 779');
+  AllLettersColumnSetup;
+  }
+  // adoTblApprovalLetters.Active    := False;
+  adoTblAllApprovalLetters.Active := False;
+//  adoTblOffsiteOwners.Active := False;
+  adoTblWelcomeLetters.Active := False;
+  // AdoTableViolationStatus.Active := False;
+  AdoTableCurrentOwners.Active := False;
+  adoTblBrowseGenVioLetters.Active := False;
+  adoTblMemoToLegal.Active := False;
+  adoTblPropInLegal.Active := False;
+  adoTblLegalStatus.Active := False;
+  // ShowMessage(ADOConnection1.ConnectionString);
 end;
 
 { ----------------------------------------------------------------------+
@@ -1423,7 +1459,7 @@ end;
   +----------------------------------------------------------------------- }
 procedure TMainForm.btnOpenSqlClick(Sender: TObject);
 var
-  i: integer;
+  i: Integer;
 begin
   if (openDlgSql.Execute) then
   begin
@@ -1477,15 +1513,23 @@ begin
   SaveDialog.FileName := '';
 end;
 
+
+
+
+procedure TMainForm.btnShowSqlClick(Sender: TObject);
+begin
+  sql_query.btnShowSqlClick1(Sender);
+end;
+
 procedure TMainForm.btnFontClick(Sender: TObject);
 begin
   if (FontDialog1.Execute) then
     RichEdit1.selAttributes.Assign(FontDialog1.font);
 end;
 
-procedure TMainForm.DBGrid8CellClick(Column: TColumn);
+procedure TMainForm.dbGridAllLettersCellClick(Column: TColumn);
 var
-  presX, presY: integer;
+  presX, presY: Integer;
   r: TRect;
 begin
   presX := GetDeviceCaps(printer.handle, LOGPIXELSX);
@@ -1581,24 +1625,24 @@ end;
 
 procedure TMainForm.RemoveGlyphImages(Sender: TObject);
 begin
-  SpeedButton1.Glyph.Assign(nil);
-  SpeedButton2.Glyph.Assign(nil);
-  SpeedButton3.Glyph.Assign(nil);
+  sbAcctSort_memo2Legal.Glyph.Assign(nil);
+  sbMemoSort_memo2Legal.Glyph.Assign(nil);
+  sbVoteSort_memo2Legal.Glyph.Assign(nil);
 end;
 
-procedure TMainForm.SpeedButton1Click(Sender: TObject);
+procedure TMainForm.sbAcctSort_memo2LegalClick(Sender: TObject);
 begin
   RemoveGlyphImages(Sender);
   SortColumn(adoTblMemoToLegal, 'houseAcct', Sender as TSpeedButton);
 end;
 
-procedure TMainForm.SpeedButton2Click(Sender: TObject);
+procedure TMainForm.sbMemoSort_memo2LegalClick(Sender: TObject);
 begin
   RemoveGlyphImages(Sender);
   SortColumn(adoTblMemoToLegal, 'memoDate', Sender as TSpeedButton);
 end;
 
-procedure TMainForm.SpeedButton3Click(Sender: TObject);
+procedure TMainForm.sbVoteSort_memo2LegalClick(Sender: TObject);
 begin
   RemoveGlyphImages(Sender);
   SortColumn(adoTblMemoToLegal, 'votingDate', Sender as TSpeedButton);
@@ -1683,62 +1727,84 @@ end;
   +----------------------------------------------------------------------- }
 procedure TMainForm.GenerateLetterButtonClear;
 begin
-  SpeedButton8.Glyph.Assign(nil);
-  SpeedButton9.Glyph.Assign(nil);
-  SpeedButton10.Glyph.Assign(nil);
-  SpeedButton11.Glyph.Assign(nil);
-  SpeedButton12.Glyph.Assign(nil);
-  SpeedButton13.Glyph.Assign(nil);
-  SpeedButton14.Glyph.Assign(nil);
-  SpeedButton16.Glyph.Assign(nil);
+  sbAcctSort_GenLetters.Glyph.Assign(nil);
+  sbVioSort_GenLetters.Glyph.Assign(nil);
+  sbDateSort_GenLetters.Glyph.Assign(nil);
+  sbTypeSort_GenLetters.Glyph.Assign(nil);
+  sbOwnerSort_GenLetters.Glyph.Assign(nil);
+  sbAddressSort_GenLetters.Glyph.Assign(nil);
+  sbNumSort_GenLetters.Glyph.Assign(nil);
+  sbPermitSort_GenLetters.Glyph.Assign(nil);
 end;
 
-procedure TMainForm.SpeedButton8Click(Sender: TObject);
+procedure TMainForm.SortColumnMod(DataSet: TADODataSet; IndexFieldName: string;
+  PushButton: TSpeedButton);
 begin
-  GenerateLetterButtonClear;
-  SortColumn(adoTblAllLetters, 'houseAcct', Sender as TSpeedButton);
+  DataSet.Filtered := False;
+  PushButton.Glyph.Assign(nil);
+  if ((PushButton.Tag Mod 2) = 1) then
+  begin
+    DataSet.IndexFieldNames := IndexFieldName + ' ASC';
+    ImageList1.GetBitmap(1, PushButton.Glyph);
+    PushButton.Tag := PushButton.Tag - 1;
+  end
+  else
+  begin
+    DataSet.IndexFieldNames := IndexFieldName + ' DESC';
+    ImageList1.GetBitmap(0, PushButton.Glyph);
+    PushButton.Tag := PushButton.Tag + 1;
+  end;
+  DataSet.Filtered := True;
 end;
 
-procedure TMainForm.SpeedButton9Click(Sender: TObject);
+procedure TMainForm.SortColumnMod(DataTable: TADOTable; IndexFieldName: string;
+  PushButton: TSpeedButton);
 begin
-  GenerateLetterButtonClear;
-  SortColumn(adoTblAllLetters, 'violationId', Sender as TSpeedButton);
+  DataTable.Filtered := False;
+  // TODO -- Remove all the speedbutton glyphs here
+  PushButton.Glyph.Assign(nil);
+  if ((PushButton.Tag Mod 2) = 1) then
+  begin
+    DataTable.IndexFieldNames := IndexFieldName + ' ASC';
+    ImageList1.GetBitmap(1, PushButton.Glyph);
+    PushButton.Tag := PushButton.Tag - 1; // := 0;
+  end
+  else
+  begin
+    DataTable.IndexFieldNames := IndexFieldName + ' DESC';
+    ImageList1.GetBitmap(0, PushButton.Glyph);
+    PushButton.Tag := PushButton.Tag + 1; // := 1;
+  end;
+  DataTable.Filtered := True;
 end;
 
-procedure TMainForm.SpeedButton10Click(Sender: TObject);
-begin
-  GenerateLetterButtonClear;
-  SortColumn(adoTblAllLetters, 'letterDate', Sender as TSpeedButton);
-end;
+{ ----------------------------------------------------------------------+
+  sbSort_GenLettersClick(Sender: TObject):
+  This is a generic procedure to apply a sort criterium to a
+  TAdoTable. It takes the following arguments:
 
-procedure TMainForm.SpeedButton11Click(Sender: TObject);
-begin
-  GenerateLetterButtonClear;
-  SortColumn(adoTblAllLetters, 'letterType', Sender as TSpeedButton);
-end;
+  TObject: The object is the speedButton that was pressed. The tag is
+  an even/odd number combination designating the field to be sorted.;
 
-procedure TMainForm.SpeedButton16Click(Sender: TObject);
+  Notice that the sort is toggled between ASCENDING and DESCENDING
+  by use of the TAG property of the TSpeedButton.
+  +----------------------------------------------------------------------- }
+procedure TMainForm.sbSort_GenLettersClick(Sender: TObject);
+var
+  sortButton: Integer;
 begin
+  sortButton := TSpeedButton(Sender).Tag;
   GenerateLetterButtonClear;
-  SortColumn(adoTblAllLetters, 'permitNumber', Sender as TSpeedButton);
-end;
-
-procedure TMainForm.SpeedButton12Click(Sender: TObject);
-begin
-  GenerateLetterButtonClear;
-  SortColumn(adoTblAllLetters, 'owner', Sender as TSpeedButton);
-end;
-
-procedure TMainForm.SpeedButton13Click(Sender: TObject);
-begin
-  GenerateLetterButtonClear;
-  SortColumn(adoTblAllLetters, 'address', Sender as TSpeedButton);
-end;
-
-procedure TMainForm.SpeedButton14Click(Sender: TObject);
-begin
-  GenerateLetterButtonClear;
-  SortColumn(adoTblAllLetters, 'letterNumber', Sender as TSpeedButton);
+  case sortButton of
+    0, 1: SortColumnMod(adoTblAllLetters, 'houseAcct', Sender as TSpeedButton);
+    2, 3: SortColumnMod(adoTblAllLetters, 'violationId', Sender as TSpeedButton);
+    4, 5: SortColumnMod(adoTblAllLetters, 'letterNumber', Sender as TSpeedButton);
+    6, 7: SortColumnMod(adoTblAllLetters, 'letterType', Sender as TSpeedButton);
+    8, 9: SortColumnMod(adoTblAllLetters, 'permitNumber', Sender as TSpeedButton);
+    10, 11: SortColumnMod(adoTblAllLetters, 'owner', Sender as TSpeedButton);
+    12, 13: SortColumnMod(adoTblAllLetters, 'address', Sender as TSpeedButton);
+    14, 15: SortColumnMod(adoTblAllLetters, 'letterDate', Sender as TSpeedButton);
+  end;
 end;
 
 procedure TMainForm.sbWelcomeCloseClick(Sender: TObject);
@@ -1758,7 +1824,7 @@ end;
 
 procedure TMainForm.btnVioStatusClick(Sender: TObject);
 var
-  myHouse: integer;
+  myHouse: Integer;
   queryString: String;
 begin
   AdoDataSetViolations.Active := False;
@@ -1801,7 +1867,7 @@ end;
   +----------------------------------------------------------------------- }
 procedure TMainForm.AdoTableCurrentOwnersAfterScroll(DataSet: TDataSet);
 var
-  myHouse: integer;
+  myHouse: Integer;
   queryString: String;
   Val: OleVariant;
 begin
@@ -1810,7 +1876,7 @@ begin
   if (VarIsNull(Val)) then
     myHouse := -999 // Set to non-existant value (dummy value)
   else
-    myHouse := integer(Val);
+    myHouse := Integer(Val);
 
   // Deactivate the Violations dataset and change its query according
   // to the All/Open/Closed selection, and then reactivate the query
@@ -1884,7 +1950,7 @@ end;
   +----------------------------------------------------------------------- }
 procedure TMainForm.AdoDataSetViolationsAfterScroll(DataSet: TDataSet);
 var
-  myViolation, statusRecordNumber: integer;
+  myViolation, statusRecordNumber: Integer;
   queryString: String;
   Val: OleVariant;
 begin
@@ -1893,7 +1959,7 @@ begin
   if (VarIsNull(Val)) then
     myViolation := -999
   else
-    myViolation := integer(Val);
+    myViolation := Integer(Val);
   // Build the SQL query with the appropriate value for the Vio Number
   queryString := 'SELECT * FROM ViolationStatus WHERE ';
   queryString := queryString + '(violationNumber = ' + IntToStr(myViolation) +
@@ -1905,7 +1971,7 @@ begin
     CommandText := queryString;
     Active := True;
     statusRecordNumber := AdoDataSetVioStatus.RecordCount;
-    StatusBar2.Panels[0].Text := 'Record Count: ' +
+    sbVioStatus.Panels[0].Text := 'Record Count: ' +
       IntToStr(statusRecordNumber);
   end;
 
@@ -1927,7 +1993,7 @@ end;
   +----------------------------------------------------------------------- }
 procedure TMainForm.AdoDataSetVioStatusAfterInsert(DataSet: TDataSet);
 var
-  myVioNumber: integer;
+  myVioNumber: Integer;
 begin
   myVioNumber := dbGridViolations.DataSource.DataSet.FieldValues['violationID'];
   with AdoDataSetVioStatus do
@@ -1946,7 +2012,7 @@ end;
   +----------------------------------------------------------------------- }
 procedure TMainForm.AdoDataSetViolationsAfterInsert(DataSet: TDataSet);
 var
-  myHouseAcct: integer;
+  myHouseAcct: Integer;
 begin
   myHouseAcct := dsCurrentOwners.DataSet.FieldValues['houseAcct'];
   with AdoDataSetViolations do
@@ -1971,8 +2037,8 @@ end;
   +----------------------------------------------------------------------- }
 procedure TMainForm.AdoDataSetVioLettersAfterInsert(DataSet: TDataSet);
 var
-  myHouseAcct: integer;
-  myVioNumber: integer;
+  myHouseAcct: Integer;
+  myVioNumber: Integer;
 begin
   // ShowMessage('After Insert');
   myHouseAcct := dsCurrentOwners.DataSet.FieldValues['houseAcct'];
@@ -2024,43 +2090,32 @@ end;
 procedure TMainForm.btnRunLettersClick(Sender: TObject);
 var
   thisLetterNum, thisLetterType: string;
-  OnOffSite: string;
+  OnOffSite,autoFormatDir: string;
   sqlText: TStringList;
   sqlDirectory, rejectType: string;
-  i, j, k: integer;
+  i, j, k: Integer;
 begin
-  { ---------------------------------------------------------------+
+  { ----------------------------------------------------------------+
     | Retrieve all the L_Type & L_Number                            |
-    +--------------------------------------------------------------- }
+    +---------------------------------------------------------------}
   with adoQryRunLetters do
   begin
     SQL.Clear;
     SQL.Append
       ('SELECT DISTINCT letterNumber, letterType FROM GenericViolationLetters ');
     SQL.Append('WHERE letterDate >= #' + DateToStr(LetterDate) + '#');
+    SQL.Append('AND LEN(TRIM(letterType)) > 0');
+    SQL.Append('AND LEN(TRIM(letterNumber)) > 0');
     SQL.Append('ORDER BY letterType, letterNumber;');
     ExecSQL;
     Active := True;
   end;
   RichEdit1.Lines.Clear;
 
-  sqlDirectory :=
-    'C:\Users\Mandy.SSCA-FRONTOFFIC\Documents\SSCA Database\SQL Queries\delphi queries\Auto Format\';
+  sqlDirectory := IniSqlDirectoryExists('sql\Directory','AutoFormat');
+
   sqlText := TStringList.Create;
 
-  { ---------------------------------------------------------------+
-    |  Write the letters to be generated to the RichEdit            |
-    +--------------------------------------------------------------- }
-  {
-    adoQryRunLetters.First;
-    for i := 1 to adoQryRunLetters.RecordCount do
-    begin
-    thisLetterNum  := adoQryRunLetters.FieldValues['letterNumber'];
-    thisLetterType := adoQryRunLetters.FieldValues['letterType'];
-    RichEdit1.Lines.Append(IntToStr(i) + ': ' + thisLetterType + '_' + thisLetterNum);
-    adoQryRunLetters.Next;
-    end;
-  }
   { ---------------------------------------------------------------+
     |  Run thru the letters: 1st for OnSite, then for OffSite       |
     +--------------------------------------------------------------- }
@@ -2114,14 +2169,12 @@ begin
           if (AnsiLeftStr(SQL[j], 2) = '/*') then
             SQL.Delete(j);
         { Save the SQL to a local file for troubleshooting purposes }
-        // ShowMessage(thisLetterType + '_' + thisLetterNum + '   : ' + IntToStr(adoQryClearLetters.Parameters.Count) );
         SQL.SaveToFile(sqlDirectory + 'ZZ_' + thisLetterType + '_' +
           thisLetterNum + '.SQL');
-        // Prepared := True;
         if (thisLetterNum <> '209') then
         begin
-          Parameters.ParamByName('L_TYPE').Value := thisLetterType;
-          Parameters.ParamByName('L_NUMBER').Value := thisLetterNum;
+          Parameters.ParamByName('L_TYPE').value := thisLetterType;
+          Parameters.ParamByName('L_NUMBER').value := thisLetterNum;
         end;
         Prepared := True;
         ExecSQL;
@@ -2253,6 +2306,11 @@ begin
 
 end;
 
+procedure TMainForm.btnRunSqlClick(Sender: TObject);
+begin
+  sql_query.btnRunSqlClick;
+end;
+
 { ----------------------------------------------------------------------+
   menuLettersClick(Sender):
   This procedure is called when the user changes the letter span.
@@ -2329,23 +2387,26 @@ end;
 
 procedure TMainForm.statBarUpdate;
 var
-  recordCount, recordNumber: Integer;
+  RecordCount, recordNumber: Integer;
 begin
-  if (adoTblAllLetters.Active) then begin
-    recordCount := adoTblAllLetters.RecordCount;
+  if (adoTblAllLetters.Active) then
+  begin
+    RecordCount := adoTblAllLetters.RecordCount;
     recordNumber := DataSource4.DataSet.RecNo
-  end else begin
-    recordCount := 0;
+  end
+  else
+  begin
+    RecordCount := 0;
     recordNumber := 0
   end;
-  statBarGenLetters.Panels[1].Text := 'Total Letters: ' + IntToStr(recordCount);
+  statBarGenLetters.Panels[1].Text := 'Total Letters: ' + IntToStr(RecordCount);
   statBarGenLetters.Panels[2].Text := 'Record #: ' + IntToStr(recordNumber);
   statBarGenLetters.Panels[3].Text := 'Letter Date >= ' + DateToStr(LetterDate);
 end;
 
 procedure TMainForm.eCurrentRouteSearchChange(Sender: TObject);
 var
-  numOfRecords: integer;
+  numOfRecords: Integer;
 begin
   if (length(eCurrentRouteSearch.Text) = 0) then
   begin
@@ -2366,7 +2427,7 @@ end;
 
 procedure TMainForm.sbRouteSortClick(Sender: TObject);
 var
-  numOfRecords: integer;
+  numOfRecords: Integer;
 begin
   AdoTableCurrentOwners.Filtered := False;
   sbRouteSort.Glyph.Assign(nil);
@@ -2399,7 +2460,7 @@ end;
 
 procedure TMainForm.pnlCurrentOwnersResize(Sender: TObject);
 var
-  margin: integer;
+  margin: Integer;
 begin
   // memoSpacing := 24;
   // bottomSpacing := 10;
@@ -2414,16 +2475,16 @@ end;
 procedure TMainForm.Connect1Click(Sender: TObject);
 var
   sConn, sSearch: WideString;
-  sourceStart, sourceEnd: integer;
+  sourceStart, sourceEnd: Integer;
 begin
   sConn := PromptDataSource(MainForm.handle, 'aaa');
   // sConn := ADOConnection1.ConnectionString;
-  ShowMessage(sConn);
+//  ShowMessage(sConn);
   sSearch := 'Data Source=';
   sourceStart := Pos(sSearch, sConn, 0);
   sourceEnd := PosEx(';', sConn, sourceStart + 1);
-  ShowMessage('start = ' + IntToStr(sourceStart) + '    end = ' +
-    IntToStr(sourceEnd));
+//  ShowMessage('start = ' + IntToStr(sourceStart) + '    end = ' +
+//    IntToStr(sourceEnd));
 
 end;
 
@@ -2433,7 +2494,7 @@ end;
   +----------------------------------------------------------------------- }
 procedure TMainForm.pnlAcAppEnterResize(Sender: TObject);
 var
-  memoSpacing, bottomSpacing, gutter, margin: integer;
+  memoSpacing, bottomSpacing, gutter, margin: Integer;
 begin
   memoSpacing := 24;
   bottomSpacing := 10;
@@ -2447,8 +2508,8 @@ begin
   lblAcApplications.Left :=
     (dbGridApprovalLetters.Width - dbGridApprovalLetters.Left -
     lblAcApplications.Width) div 2;
-  DBNavigator5.Left := (dbGridApprovalLetters.Width - dbGridApprovalLetters.Left
-    - DBNavigator5.Width) div 2;
+  dbnavAcAppEntry.Left := (dbGridApprovalLetters.Width - dbGridApprovalLetters.Left
+    - dbnavAcAppEntry.Width) div 2;
   // Set the Left edge for the Memo fields and their Labels
   lblAcAppSpecAppWords.Left := dbGridApprovalLetters.Left +
     dbGridApprovalLetters.Width + gutter;
@@ -2483,7 +2544,7 @@ end;
 
 procedure TMainForm.pnlGenVioLetterEnterResize(Sender: TObject);
 var
-  memoSpacing, margin: integer;
+  memoSpacing, margin: Integer;
 begin
   memoSpacing := 24;
   // bottomSpacing := 10;
@@ -2500,7 +2561,7 @@ begin
     (pnlGenVioLetterEnter.Height - dbGridGenVioLetters.Height -
     dbGridGenVioLetters.Top - 3 * lblGenVioLettersSpecText.Height - 3 *
     memoSpacing - margin) div 3;
-  dbMemoGenVioLettersVioText.Height    := dbMemoGenVioLettersSpecText.Height;
+  dbMemoGenVioLettersVioText.Height := dbMemoGenVioLettersSpecText.Height;
   dbMemoGenVioLettersRemedyText.Height := dbMemoGenVioLettersSpecText.Height;
   // Set the Top of the Memo fields and the associated Labels
   lblGenVioLettersSpecText.Top := dbGridGenVioLetters.Top +
@@ -2519,7 +2580,7 @@ end;
 
 procedure TMainForm.pnlViolationsResize(Sender: TObject);
 var
-  gutter, margin: integer;
+  gutter, margin: Integer;
 begin
   // memoSpacing := 24;
   // bottomSpacing := 10;
@@ -2542,7 +2603,7 @@ end;
 
 procedure TMainForm.pnlAllGenVioLettersResize(Sender: TObject);
 var
-  memoSpacing, gutter, margin: integer;
+  memoSpacing, gutter, margin: Integer;
 begin
   memoSpacing := 24;
   // bottomSpacing := 10;
@@ -2566,8 +2627,9 @@ begin
   DBMemo9.Width := DBMemo8.Width;
   DBMemo10.Width := DBMemo8.Width;
   // Set the dbMemo field Height
-  DBMemo8.Height := ((dbGridBrowseGenVioLetters.Height -
-    (3 * Label14.Height + 2 * memoSpacing)) div 3) - 2;
+  DBMemo8.Height :=
+    ((dbGridBrowseGenVioLetters.Height - (3 * Label14.Height + 2 * memoSpacing))
+    div 3) - 2;
   DBMemo9.Height := DBMemo8.Height;
   DBMemo10.Height := DBMemo8.Height;
   // Set the Top position for the dbMemos and the Labels
@@ -2579,18 +2641,18 @@ end;
 
 procedure TMainForm.pnlVioStatusResize(Sender: TObject);
 var
-  memoSpacing, gutter, margin: integer;
+  memoSpacing, gutter, margin: Integer;
 begin
   memoSpacing := 24;
   // bottomSpacing := 10;
   gutter := 30;
   margin := 5;
   lblVioStatus.Left := (pnlVioStatus.Width - lblVioStatus.Width) div 3;
-  DBNavigator4.Left := dbMemoVioStatStatus.Left +
+  dbnavVioStatus.Left := dbMemoVioStatStatus.Left +
     (dbMemoVioStatStatus.Width div 2);
   dbGridVioStatus.Left := margin;
   dbGridVioStatus.Height := pnlVioStatus.Height - dbGridVioStatus.Top -
-    StatusBar2.Height - margin;
+    sbVioStatus.Height - margin;
   lblVioStatStatus.Left := dbGridVioStatus.Left + dbGridVioStatus.Width
     + gutter;
   lblVioStatAction.Left := lblVioStatStatus.Left;
@@ -2599,9 +2661,13 @@ begin
   dbMemoVioStatAction.Width := pnlVioStatus.Width - 2 * margin - gutter -
     dbGridVioStatus.Width;
   dbMemoVioStatStatus.Width := dbMemoVioStatAction.Width;
-  dbMemoVioStatStatus.Height :=
+  dbMemoVioStatStatus.Height := 15 +
     (dbGridVioStatus.Height - 2 * lblVioStatStatus.Height - memoSpacing) div 2;
+
   dbMemoVioStatAction.Height := dbMemoVioStatStatus.Height;
+  dbMemoVioStatAction.Height := dbGridVioStatus.Top +dbGridVioStatus.Height - dbMemoVioStatAction.Top;
+
+
   dbMemoVioStatStatus.Top := lblVioStatStatus.Top + lblVioStatStatus.Height;
   lblVioStatAction.Top := dbMemoVioStatStatus.Top + dbMemoVioStatStatus.Height +
     memoSpacing;
@@ -2611,7 +2677,7 @@ end;
 
 procedure TMainForm.pnlHousesEnterResize(Sender: TObject);
 var
-  margin: integer;
+  margin: Integer;
 begin
   // memoSpacing := 24;
   // bottomSpacing := 10;
@@ -2625,7 +2691,7 @@ end;
 
 procedure TMainForm.pnlOwnersEnterResize(Sender: TObject);
 var
-  margin: integer;
+  margin: Integer;
 begin
   // memoSpacing := 24;
   // bottomSpacing := 10;
@@ -2640,7 +2706,7 @@ end;
 
 procedure TMainForm.pnlWelcomeEnterResize(Sender: TObject);
 var
-  margin: integer;
+  margin: Integer;
 begin
   // memoSpacing := 24;
   // bottomSpacing := 10;
@@ -2655,7 +2721,7 @@ end;
 
 procedure TMainForm.pnlGenLetters2Resize(Sender: TObject);
 var
-  margin: integer;
+  margin: Integer;
 begin
   // memoSpacing := 24;
   // bottomSpacing := 10;
@@ -2668,19 +2734,19 @@ end;
 
 procedure TMainForm.pnlGenLetters1Resize(Sender: TObject);
 var
-  margin: integer;
+  margin: Integer;
 begin
   // memoSpacing := 24;
   // bottomSpacing := 10;
   // gutter := 30;
   margin := 5;
-  DBGrid8.Width := pnlGenLetters1.Width - 2 * margin;
-  DBGrid8.Height := pnlGenLetters1.Height - DBGrid8.Top -
+  dbGridAllLetters.Width := pnlGenLetters1.Width - 2 * margin;
+  dbGridAllLetters.Height := pnlGenLetters1.Height - dbGridAllLetters.Top -
     statBarGenLetters.Height - margin;
 
 end;
 
-procedure TMainForm.TabSheet7Resize(Sender: TObject);
+procedure TMainForm.tsGenLettersResize(Sender: TObject);
 begin
   // do something here
   pnlGenLetters1Resize(Sender);
@@ -2689,7 +2755,7 @@ end;
 
 procedure TMainForm.pnlAcApps2Resize(Sender: TObject);
 var
-  memoSpacing, margin: integer;
+  memoSpacing, margin: Integer;
 begin
   memoSpacing := 24;
   // bottomSpacing := 10;
@@ -2709,9 +2775,9 @@ begin
   DBMemo19.Top := Label27.Top + Label27.Height;
   DBGrid3.Left := margin;
   DBGrid3.Width := pnlAcApps1.Width - DBGrid3.Left - memoSpacing;
-  DBNavigator1.Top := pnlAcApps1.Height - DBNavigator1.Height - margin;
-  DBNavigator1.Left := (pnlAcApps1.Width - DBNavigator1.Width) div 2;
-  DBGrid3.Height := DBNavigator1.Top - memoSpacing - DBGrid3.Top;
+  dbnavAllAcApps.Top := pnlAcApps1.Height - dbnavAllAcApps.Height - margin;
+  dbnavAllAcApps.Left := (pnlAcApps1.Width - dbnavAllAcApps.Width) div 2;
+  DBGrid3.Height := dbnavAllAcApps.Top - memoSpacing - DBGrid3.Top;
 
 end;
 
@@ -2727,7 +2793,7 @@ end;
   +----------------------------------------------------------------------- }
 procedure TMainForm.AdoDataAllAppLettersAfterInsert(DataSet: TDataSet);
 var
-  myHouseAcct: integer;
+  myHouseAcct: Integer;
 begin
   myHouseAcct := dsCurrentOwners.DataSet.FieldValues['houseAcct'];
   with AdoDataAllAppLetters do
@@ -2742,14 +2808,14 @@ end;
 
 procedure TMainForm.pnlMemoToLegalResize(Sender: TObject);
 var
-  margin: integer;
+  margin: Integer;
 begin
-//  memoSpacing := 24;
+  // memoSpacing := 24;
   // bottomSpacing := 10;
   // gutter := 30;
   margin := 5;
-  DBGrid1.Width := TabSheet8.Width - 2 * margin;
-  DBGrid1.Height := TabSheet8.Height - DBGrid1.Top - margin;
+  DBGrid1.Width := tsMemo2Legal.Width - 2 * margin;
+  DBGrid1.Height := tsMemo2Legal.Height - DBGrid1.Top - margin;
 end;
 
 { ----------------------------------------------------------------------+
@@ -2760,7 +2826,7 @@ end;
   +----------------------------------------------------------------------- }
 procedure TMainForm.AdoDataSetOwnersAfterInsert(DataSet: TDataSet);
 var
-  myHouseAcct: integer;
+  myHouseAcct: Integer;
 begin
   myHouseAcct := dsCurrentOwners.DataSet.FieldValues['houseAcct'];
   with AdoDataSetOwners do
@@ -2779,9 +2845,9 @@ end;
   +----------------------------------------------------------------------- }
 procedure TMainForm.AdoDataSetOwnersAfterPost(DataSet: TDataSet);
 var
-  recNumber: integer;
+  recNumber: Integer;
 begin
-//  acctNumber := AdoDataSetOwners.FieldValues['houseacct'];
+  // acctNumber := AdoDataSetOwners.FieldValues['houseacct'];
   recNumber := AdoTableCurrentOwners.RecNo;
   AdoDataSetOwners.Active := False;
   AdoTableCurrentOwners.Active := False;
@@ -2792,221 +2858,19 @@ begin
   // eCurrentAcctSearch.OnChange(eCurrentAcctSearch);
 end;
 
-procedure TMainForm.PageControl1Change(Sender: TObject);
+procedure TMainForm.pcAcAppsChange(Sender: TObject);
 begin
   tsAllOwners.Brush.Color := RGB(200, 140, 230);
 end;
 
-procedure TMainForm.PageControl1DrawTab(Control: TCustomTabControl;
+procedure TMainForm.pcAcAppsDrawTab(Control: TCustomTabControl;
   TabIndex: Integer; const Rect: TRect; Active: Boolean);
 begin
   DrawTab(Control, TabIndex, Rect, Active);
 end;
 
-procedure CreateIniFile;
-var
-  Ini: TIniFile;
-  fileName : string;
-  myFile   : TextFile;
-  data     : string;
-begin
-  fileName := ChangeFileExt( Application.ExeName, '.INI' );
-  if FileExists(fileName) then Exit;
-  Ini := TIniFile.Create(fileName);
-  try
-    Ini.WriteString( 'Connection', 'ConnString', '44');
-    Ini.WriteInteger( 'Form', 'Left', 50);
-    Ini.WriteString( 'Form', 'Caption', 'what is going on here' );
-    Ini.WriteFloat('Colors\Panels','pnlCurrentOwners',     $0084B984);
-    Ini.WriteFloat('Colors\Panels','pnlAcAppEnter',        $0061AE0C);
-    Ini.WriteFloat('Colors\Panels','pnlVioStatus',         $00F1A65A);
-    Ini.WriteFloat('Colors\Panels','pnlGenVioLetterEnter', $004798E0);
-    Ini.WriteFloat('Colors\Panels','pnlHousesEnter',       $00DE8B3E);
-    Ini.WriteFloat('Colors\Panels','pnlOwnersEnter',       $00399AE1);
-    Ini.WriteFloat('Colors\Panels','pnlWelcomeEnter',      $0054C622);
-    Ini.WriteFloat('Colors\Panels','pnlAllGenVioLetters',  $004998E0);
-    Ini.WriteFloat('Colors\Panels','pnlAcApps1',           $00D1B499);
-    Ini.WriteFloat('Colors\Panels','pnlAcApps2',           $00D1B499);
-    Ini.WriteFloat('Colors\Panels','pnlGenLetters1',       $00EEC29B);
-    Ini.WriteFloat('Colors\Panels','pnlGenLetters2',       $00EEC29B);
-    Ini.WriteFloat('Colors\Panels','pnlMemoToLegal',       $00FB5942);
-
-
-
-
-    Ini.WriteFloat('Colors','dbGridCurrentOwners',   $00B1D2B0);
-    Ini.WriteFloat('Colors','AC Applications Grid',  $0097F231);
-    Ini.WriteFloat('Colors','Violations Grid',       $00EFD0C9);
-    Ini.WriteFloat('Colors','Current Owners Grid', $00B1D2B0);
-    Ini.WriteFloat('Colors','Current Owners Grid', $00B1D2B0);
-  finally
-    Ini.Free;
-  end
-end;
-
-function IniFileExists: boolean;
-var
-  filename: string;
-begin
-  fileName := ChangeFileExt( Application.ExeName, '.INI' );
-  IniFileExists := FileExists(fileName);
-end;
-
-function ReadIniString(section, key: string): string overload;
-var
-  Ini: TIniFile;
-  fileName, value: string;
-begin
-  ReadIniString := '';
-  filename := ChangeFileExt(Application.ExeName, '.ini');
-  if FileExists(fileName) then begin
-    try
-      Ini := TIniFile.Create(fileName);
-      ReadIniString := Ini.ReadString(section, key, '');
-    finally
-      Ini.Free
-    end;
-  end;
-end;
-
-function ReadIniBoolean(section, key: string): boolean overload;
-var
-  Ini: TIniFile;
-  fileName: string;
-  value: Boolean;
-begin
-  ReadIniBoolean := False;
-  filename := ChangeFileExt(Application.ExeName, '.ini');
-  if FileExists(fileName) then begin
-    try
-      Ini := TIniFile.Create(fileName);
-      ReadIniBoolean := Ini.ReadBool(section, key, False);
-    finally
-      Ini.Free
-    end;
-  end;
-end;
-
-function ReadIniColor(section, key: string): TColor overload;
-var
-  Ini: TIniFile;
-  fileName: string;
-begin
-  ReadIniColor := 0;
-  filename := ChangeFileExt(Application.ExeName, '.ini');
-  if FileExists(fileName) then begin
-    try
-      Ini := TIniFile.Create(fileName);
-      ReadIniColor := Ini.ReadInteger(section, key, 0);
-    finally
-      Ini.Free
-    end;
-  end;
-end;
-
-function ReadIniInteger(section, key: string): integer overload;
-begin
-  ReadIniInteger := ReadIniColor(section, key);
-end;
-
-function ReadIniDouble(section, key: string): double overload;
-var
-  Ini: TIniFile;
-  fileName: string;
-begin
-  ReadIniDouble := 0.0;
-  filename := ChangeFileExt(Application.ExeName, '.ini');
-  if FileExists(fileName) then begin
-    try
-      Ini := TIniFile.Create(fileName);
-      ReadIniDouble := Ini.ReadFloat(section, key, 0.0);
-    finally
-      Ini.Free
-    end;
-  end;
-end;
-
-function WriteIniString(section, key, value: string): boolean overload;
-var
-  Ini: TIniFile;
-  fileName: string;
-begin
-  WriteIniString := False;
-  filename := ChangeFileExt(Application.ExeName, '.ini');
-  if not(FileExists(fileName)) then
-    CreateIniFile;
-  if FileExists(fileName) then begin
-    try
-      Ini := TIniFile.Create(fileName);
-      Ini.WriteString(section, key, value);
-      WriteIniString := True;
-    finally
-      Ini.Free
-    end;
-  end;
-end;
-
-function WriteIniBoolean(section, key: string; value: boolean): boolean overload;
-var
-  Ini: TIniFile;
-  fileName: string;
-begin
-  WriteIniBoolean := False;
-  filename := ChangeFileExt(Application.ExeName, '.ini');
-  if FileExists(fileName) then begin
-    try
-      Ini := TIniFile.Create(fileName);
-      Ini.WriteBool(section, key, value);
-      WriteIniBoolean := True;
-    finally
-      Ini.Free
-    end;
-  end;
-end;
-
-function WriteIniColor(section, key: string; value: TColor): boolean overload;
-var
-  Ini: TIniFile;
-  fileName: string;
-begin
-  WriteIniColor := False;
-  filename := ChangeFileExt(Application.ExeName, '.ini');
-  if FileExists(fileName) then begin
-    try
-      Ini := TIniFile.Create(fileName);
-      Ini.WriteInteger(section, key, value);
-      WriteIniColor := True;
-    finally
-      Ini.Free
-    end;
-  end;
-end;
-
-function WriteIniInteger(section, key: string; value: integer): boolean overload;
-begin
-  WriteIniInteger := WriteIniColor(section, key, value);
-end;
-
-function WriteIniDouble(section, key: string; value: double): boolean overload;
-var
-  Ini: TIniFile;
-  fileName: string;
-begin
-  WriteIniDouble := False;
-  filename := ChangeFileExt(Application.ExeName, '.ini');
-  if FileExists(fileName) then begin
-    try
-      Ini := TIniFile.Create(fileName);
-      Ini.WriteFloat(section, key, value);
-      WriteIniDouble := True;
-    finally
-      Ini.Free
-    end;
-  end;
-end;
-
-procedure DrawTab( oControl: TCustomTabControl; TabIndex: Integer;
-const Rect: TRect; Active: Boolean);
+procedure DrawTab(oControl: TCustomTabControl; TabIndex: Integer;
+  const Rect: TRect; Active: Boolean);
 var
   oRect: TRect;
   sCaption: string;
@@ -3023,57 +2887,72 @@ begin
   // Color the tab the same as the Major panel
   iTabTag := TPageControl(oControl).Pages[TabIndex].Tag;
   case iTabTag of
-    1:  cTabColor := $0061ae0c;
-    2:  cTabColor := $00f1a65a;
-    3:  cTabColor := $0054c622;
-    4:  cTabColor := $004998e0;
-    5:  cTabColor := clActiveCaption;
-    6:  cTabColor := clBtnFace ;
-    7:  cTabColor := $00eec29b;
-    8:  cTabColor := $00fb5942;
-    9:  cTabColor := clBtnFace;
-    10: cTabColor := $00e68cc8;
+    1:
+      cTabColor := $0061AE0C;         // pnlAcAppEnter
+    2:
+      cTabColor := $00F1A65A;         // pnlVioStatus
+    3:
+      cTabColor := $0054C622;         // pnlWelcomeEnter
+    4:
+      cTabColor := $004998E0;         // pnlAllGenVioLetters
+    5:
+      cTabColor := clActiveCaption;
+    6:
+      cTabColor := clBtnFace;
+    7:
+      cTabColor := $00EEC29B;        // pnlGenLetters1
+    8:
+      cTabColor := $00FB5942;        // pnlMemoToLegal
+    9:
+      cTabColor := clBtnFace;
+    10:
+      cTabColor := $00E68CC8;
   end;
 
-  iTop  := Rect.Top  + ((Rect.Bottom - Rect.Top - oControl.Canvas.TextHeight(sCaption)) div 2) + 1;
-  iLeft := Rect.Left + ((Rect.Right  - Rect.Left - oControl.Canvas.TextWidth(sCaption)) div 2) + 1;
+  iTop := Rect.Top +
+    ((Rect.Bottom - Rect.Top - oControl.Canvas.TextHeight(sCaption)) div 2) + 1;
+  iLeft := Rect.Left +
+    ((Rect.Right - Rect.Left - oControl.Canvas.TextWidth(sCaption)) div 2) + 1;
 
-  if (Active) then begin
+  if (Active) then
+  begin
     oControl.Canvas.Brush.Color := cTabColor;
     oControl.Canvas.FillRect(Rect);
     Frame3D(oControl.Canvas, oRect, clBtnHighlight, clBtnShadow, 2);
-  end else begin
+  end
+  else
+  begin
     oControl.Canvas.Brush.Color := clBtnFace;
     oControl.Canvas.FillRect(Rect);
   end;
-  oControl.Canvas.TextOut(iLeft,iTop,sCaption);
+  oControl.Canvas.TextOut(iLeft, iTop, sCaption);
 end;
 
 procedure TMainForm.SpeedButton5Click(Sender: TObject);
 var
-  numOfRecords: integer;
+  numOfRecords: Integer;
 begin
   adoTableOwners.Filtered := False;
   adoTableOwners.IndexFieldNames := 'Owner';
   adoTableOwners.Filtered := True;
   numOfRecords := adoTableOwners.RecordCount;
-  StatusBar1.Panels[1].Text := 'Record Count: ' + IntToStr(numOfRecords);
+  sbAllOwners.Panels[1].Text := 'Record Count: ' + IntToStr(numOfRecords);
 end;
 
 procedure TMainForm.tsAllOwnersResize(Sender: TObject);
 var
-  margin: integer;
+  margin: Integer;
 begin
-//  memoSpacing := 24;
+  // memoSpacing := 24;
   // bottomSpacing := 10;
   // gutter := 30;
   margin := 5;
-  with DBGrid2 do
+  with dbgridAllOwners do
   begin
     Top := 9;
     Left := margin;
     Width := pnlAllOwners.Width - 2 * margin;
-    Height := pnlAllOwners.Height - StatusBar1.Height - Top - margin;
+    Height := pnlAllOwners.Height - sbAllOwners.Height - Top - margin;
   end;
 end;
 
@@ -3090,13 +2969,14 @@ end;
 procedure TMainForm.tsAllOwnersEnter(Sender: TObject);
 begin
   tsAcAppEntry.Highlighted := True;
-  tsAcAppEntry.Font.Style := tsAcAppEntry.Font.Style + [TFontStyle.fsBold];
+  tsAcAppEntry.font.Style := tsAcAppEntry.font.Style + [TFontStyle.fsBold];
 end;
 
 procedure TMainForm.tsAllOwnersHide(Sender: TObject);
 begin
   (Sender as TTabSheet).Highlighted := False;
-  (Sender as TTabSheet).Font.Style := (Sender as TTabSheet).Font.Style - [TFontStyle.fsBold];
+  (Sender as TTabSheet).font.Style := (Sender as TTabSheet).font.Style -
+    [TFontStyle.fsBold];
 end;
 
 procedure TMainForm.menuCompactDbClick(Sender: TObject);
@@ -3108,7 +2988,7 @@ begin
   AdoTableGenVioLetters.Active := False;
   adoTblHouses.Active := False;
   adoTblAllApprovalLetters.Active := False;
-  adoTblOffsiteOwners.Active := False;
+//  adoTblOffsiteOwners.Active := False;
   adoTblWelcomeLetters.Active := False;
   AdoTableCurrentOwners.Active := False;
   AdoTableViolations.Active := False;
@@ -3142,8 +3022,8 @@ procedure TMainForm.CompactDatabase(const MdbFileName: string;
   ADOConnection: TADOConnection = nil; const ReopenCOnnection: Boolean = True);
 var
   LdbFileName, TempFileName: string;
-  FailCount: integer;
-  FileHandle: integer;
+  FailCount: Integer;
+  FileHandle: Integer;
 begin
   TempFileName := ChangeFileExt(MdbFileName, '.temp.accdb');
   // ShowMessage('Temp File Name: ' + TempFileName);
@@ -3243,16 +3123,23 @@ begin
   TEditChange(filterText);
 end;
 
-{ ----------------------------------------------------------------------+
-  DBGrid2CellClick():
-  This procedure finds the houseAcct value of the current record
-  in the All_Owners grid and copies it to the "Acct Search" TEdit
-  box. It then calls the eCurrentAcctSearchChange event.
-  +----------------------------------------------------------------------- }
-procedure TMainForm.DBGrid2CellClick(Column: TColumn);
+
+// Cannot move to another unit
+procedure TMainForm.dbgridAllOwnersCellClick(Column: TColumn);
 begin
   eCurrentAcctSearch.Text := adoTableOwners.FieldValues['houseAcct'];
   eCurrentAcctSearchChange(Column);
 end;
+
+procedure TMainForm.DBGrid2DblClick(Sender: TObject);
+begin
+
+end;
+
+//{$INCLUDE ini_file.pas}
+
+
+
+
 
 end.

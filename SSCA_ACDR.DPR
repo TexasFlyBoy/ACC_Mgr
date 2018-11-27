@@ -4,7 +4,12 @@ uses
   Forms,
   Main in 'Main.pas' {MainForm},
   About in 'About.pas' {AboutBox},
-  SplashScreen in 'SplashScreen.pas' {SplashScn};
+  SplashScreen in 'SplashScreen.pas' {SplashScn},
+  sql_query in 'sql_query.pas',
+  ini_file in 'ini_file.pas',
+  all_owners in 'all_owners.pas',
+  all_letters in 'all_letters.pas',
+  genVioLetters in 'genVioLetters.pas';
 
 {$R *.RES}
 
