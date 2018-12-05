@@ -2645,34 +2645,30 @@ var
 begin
   memoSpacing := 24;
   // bottomSpacing := 10;
-  gutter := 30;
+  gutter := 7;
   margin := 5;
+
   lblVioStatus.Left := (pnlVioStatus.Width - lblVioStatus.Width) div 3;
-  dbnavVioStatus.Left := dbMemoVioStatStatus.Left +
-    (dbMemoVioStatStatus.Width div 2);
+  dbnavVioStatus.Left := dbMemoVioStatStatus.Left + (dbMemoVioStatStatus.Width div 2);
   dbGridVioStatus.Left := margin;
-  dbGridVioStatus.Height := pnlVioStatus.Height - dbGridVioStatus.Top -
-    sbVioStatus.Height - margin;
-  lblVioStatStatus.Left := dbGridVioStatus.Left + dbGridVioStatus.Width
-    + gutter;
+  dbGridVioStatus.Height := pnlVioStatus.Height - dbGridVioStatus.Top - sbVioStatus.Height - margin;
+
+  lblVioStatStatus.Left := dbGridVioStatus.Left + dbGridVioStatus.Width + gutter;
   lblVioStatAction.Left := lblVioStatStatus.Left;
+
   dbMemoVioStatAction.Left := lblVioStatStatus.Left;
   dbMemoVioStatStatus.Left := lblVioStatStatus.Left;
-  dbMemoVioStatAction.Width := pnlVioStatus.Width - 2 * margin - gutter -
-    dbGridVioStatus.Width;
+
+  dbMemoVioStatAction.Width := pnlVioStatus.Width - margin - lblVioStatStatus.Left;
   dbMemoVioStatStatus.Width := dbMemoVioStatAction.Width;
-  dbMemoVioStatStatus.Height := 15 +
-    (dbGridVioStatus.Height - 2 * lblVioStatStatus.Height - memoSpacing) div 2;
-
-  dbMemoVioStatAction.Height := dbMemoVioStatStatus.Height;
-  dbMemoVioStatAction.Height := dbGridVioStatus.Top +dbGridVioStatus.Height - dbMemoVioStatAction.Top;
-
 
   dbMemoVioStatStatus.Top := lblVioStatStatus.Top + lblVioStatStatus.Height;
-  lblVioStatAction.Top := dbMemoVioStatStatus.Top + dbMemoVioStatStatus.Height +
-    memoSpacing;
+  dbMemoVioStatStatus.Height := 15 + (dbGridVioStatus.Height - 2 * lblVioStatStatus.Height - memoSpacing) div 2;
+
+  lblVioStatAction.Top := dbMemoVioStatStatus.Top + dbMemoVioStatStatus.Height + memoSpacing;
   dbMemoVioStatAction.Top := lblVioStatAction.Top + lblVioStatAction.Height;
 
+  dbMemoVioStatAction.Height := dbGridVioStatus.Top + dbGridVioStatus.Height - dbMemoVioStatAction.Top;
 end;
 
 procedure TMainForm.pnlHousesEnterResize(Sender: TObject);
