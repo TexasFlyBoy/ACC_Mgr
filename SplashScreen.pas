@@ -15,6 +15,7 @@ type
     StaticText2: TStaticText;
     StaticText3: TStaticText;
     stReconnect: TStaticText;
+    StaticText4: TStaticText;
     procedure FormShow(Sender: TObject);
     procedure Timer1Timer(Sender: TObject);
   private

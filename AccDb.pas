@@ -25,18 +25,21 @@ begin
       if (AllOwnersOpen) then
         AllOwnersColumnSetup(Connect);
       AllLettersColumnSetup;
+
       adoTblAllApprovalLetters.Active := Connect;
 //      adoTblOffsiteOwners.Active := Connect;
+
       adoTblWelcomeLetters.Active := Connect;
       AdoTableCurrentOwners.Active := Connect;
       adoTblBrowseGenVioLetters.Active := Connect;
       adoTblMemoToLegal.Active := Connect;
       adoTblPropInLegal.Active := Connect;
       adoTblLegalStatus.Active := Connect;
+
       MakeConnection := True;
     end;
   except
-    // do something here
+    ShowMessage('There was a problem connecting the tables.');
   end;
 end;
 

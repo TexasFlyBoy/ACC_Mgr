@@ -2917,9 +2917,10 @@ object SplashScn: TSplashScn
   object StaticText1: TStaticText
     Left = 64
     Top = 176
-    Width = 400
+    Width = 409
     Height = 23
     Alignment = taCenter
+    AutoSize = False
     Caption = 'SSCA Architectural Control Committee Database'
     Color = clBlack
     Font.Charset = DEFAULT_CHARSET
@@ -2951,7 +2952,7 @@ object SplashScn: TSplashScn
     Transparent = False
   end
   object StaticText3: TStaticText
-    Left = 400
+    Left = 406
     Top = 381
     Width = 107
     Height = 20
@@ -2971,7 +2972,7 @@ object SplashScn: TSplashScn
   object stReconnect: TStaticText
     Left = 64
     Top = 197
-    Width = 400
+    Width = 409
     Height = 23
     ParentCustomHint = False
     Alignment = taCenter
@@ -2992,6 +2993,24 @@ object SplashScn: TSplashScn
     TabOrder = 3
     Transparent = False
     Visible = False
+  end
+  object StaticText4: TStaticText
+    Left = 22
+    Top = 381
+    Width = 77
+    Height = 20
+    Alignment = taCenter
+    Caption = 'Version 2.4'
+    Color = clBlack
+    Font.Charset = DEFAULT_CHARSET
+    Font.Color = clYellow
+    Font.Height = -13
+    Font.Name = 'Tahoma'
+    Font.Style = [fsBold]
+    ParentColor = False
+    ParentFont = False
+    TabOrder = 4
+    Transparent = False
   end
   object Timer1: TTimer
     Enabled = False

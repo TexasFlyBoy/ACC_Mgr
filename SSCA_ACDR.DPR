@@ -9,7 +9,8 @@ uses
   ini_file in 'ini_file.pas',
   all_owners in 'all_owners.pas',
   all_letters in 'all_letters.pas',
-  genVioLetters in 'genVioLetters.pas';
+  genVioLetters in 'genVioLetters.pas',
+  AccDb in 'AccDb.pas';
 
 {$R *.RES}
 

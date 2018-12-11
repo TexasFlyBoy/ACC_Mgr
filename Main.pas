@@ -150,13 +150,8 @@ type
     sbAppYearSort: TSpeedButton;
     dbnavAllAcApps: TDBNavigator;
     adoTblPropInLegal: TADOTable;
-    adoTblLegalStatus: TADOTable;
-    DBGrid4: TDBGrid;
-    DBGrid5: TDBGrid;
     dsPropInLegal: TDataSource;
     dsLegalStatus: TDataSource;
-    DBMemo12: TDBMemo;
-    DBMemo13: TDBMemo;
     PopupMenu1: TPopupMenu;
     DeleteRecord1: TMenuItem;
     dbnavGenVioLetters: TDBNavigator;
@@ -455,7 +450,6 @@ type
     ADOTable2: TADOTable;
     Button1: TButton;
     adoTblHousesdriveRoute: TFloatField;
-    dbnavLegalStatUpdate: TDBNavigator;
     AdoTableCurrentOwnersmobilePhone1: TWideStringField;
     AdoTableCurrentOwnersmobilePhone2: TWideStringField;
     AdoDataSetOwnersmobilePhone1: TWideStringField;
@@ -474,6 +468,26 @@ type
     memoSqlText: TMemo;
     dbGridSqlView: TDBGrid;
     sbSqlView: TStatusBar;
+    pnlLegalMatterStatus: TPanel;
+    pnlLegalMatters: TPanel;
+    dbGridLegalMatters: TDBGrid;
+    dbMemoLegalMatters: TDBMemo;
+    sbLegalMatters: TStatusBar;
+    Splitter7: TSplitter;
+    dbnavLegalStatUpdate: TDBNavigator;
+    dbGridLegalMatterStatus: TDBGrid;
+    dbMemoLegalMatterStatus: TDBMemo;
+    sbLegalMatterStatus: TStatusBar;
+    SpeedButton1: TSpeedButton;
+    Button2: TButton;
+    sbLegalStatusDateSort: TSpeedButton;
+    Label9: TLabel;
+    Label10: TLabel;
+    adoTblLegalStatus: TADOTable;
+    adoTblLegalStatusstatusId: TAutoIncField;
+    adoTblLegalStatusmatterNumber: TIntegerField;
+    adoTblLegalStatusstatusText: TWideMemoField;
+    adoTblLegalStatusstatusDate: TDateTimeField;
     procedure FormCreate(Sender: TObject);
     procedure ShowHint(Sender: TObject);
     procedure FileNew(Sender: TObject);
@@ -603,6 +617,14 @@ type
 //    procedure btnRunSqlClick(Sender: TObject);
 //    procedure btnShowSqlClick(Sender: TObject);
     procedure sbSort_GenLettersClick(Sender: TObject);
+    procedure pnlLegalMattersResize(Sender: TObject);
+    procedure pnlLegalMatterStatusResize(Sender: TObject);
+    procedure Button2Click(Sender: TObject);
+    procedure adoTblPropInLegalAfterScroll(DataSet: TDataSet);
+    procedure adoTblLegalStatusAfterScroll(DataSet: TDataSet);
+    procedure sbLegalStatusDateSortClick(Sender: TObject);
+    procedure adoTblPropInLegalAfterInsert(DataSet: TDataSet);
+    procedure adoTblLegalStatusAfterInsert(DataSet: TDataSet);
 
   private
     procedure SortColumn(DataTable: TADOTable; IndexFieldName: string;
@@ -1346,6 +1368,12 @@ begin
 end;
 
 
+procedure TMainForm.Button2Click(Sender: TObject);
+begin
+ ShowMessage('adoTblPropInLegal.Active:' + BoolToStr(adoTblPropInLegal.Active));
+ adoTblPropInLegal.Active := True;
+end;
+
 procedure TMainForm.sbAppLetterSortClick(Sender: TObject);
 begin
   BuildSortAppTableQuery('letterDate', sbAppLetterSort);
@@ -1390,6 +1418,21 @@ begin
   AdoTableCurrentOwners.Filtered := True;
   numOfRecords := AdoTableCurrentOwners.RecordCount;
   sbCurrentOwners.Panels[1].Text := 'Record Count: ' + IntToStr(numOfRecords);
+end;
+
+procedure TMainForm.sbLegalStatusDateSortClick(Sender: TObject);
+var
+  sortOrder: Integer;
+begin
+  // Tag = 0 signifies ASC
+  // Tag = 1 signifies DESC
+  if (TSpeedButton(Sender).Tag = 1) then begin
+    adoTblLegalStatus.IndexFieldNames := 'statusDate ASC';
+    TSpeedButton(Sender).Tag := 0
+  end else begin
+    adoTblLegalStatus.IndexFieldNames := 'statusDate DESC';
+    TSpeedButton(Sender).Tag := 1
+  end;
 end;
 
 procedure TMainForm.sbOffsiteSortClick(Sender: TObject);
@@ -1606,6 +1649,25 @@ begin
   UpdateCurrentHouseAcct(adoTblBrowseGenVioLetters.FieldValues['houseAcct']);
 end;
 
+procedure TMainForm.adoTblLegalStatusAfterInsert(DataSet: TDataSet);
+var
+  myMatterNumber: Integer;
+begin
+  myMatterNumber := adoTblPropInLegal.FieldByName('matterNumber').AsInteger;
+//  ShowMessage('Matter #: ' + IntToStr(myMatterNumber));
+  with adoTblLegalStatus do
+  begin
+    FieldValues['matterNumber'] := myMatterNumber;
+    FieldValues['statusDate'] := Date;
+  end;
+end;
+
+procedure TMainForm.adoTblLegalStatusAfterScroll(DataSet: TDataSet);
+begin
+  sbLegalMatterStatus.Panels[1].Text := 'Num of Records: ' + IntToStr(adoTblLegalStatus.RecordCount);
+  sbLegalMatterStatus.Panels[2].Text := 'Record: ' + IntToStr(adoTblLegalStatus.RecNo);
+end;
+
 procedure TMainForm.adoTblMemoToLegalNewRecord(DataSet: TDataSet);
 var
   houseAccount: string;
@@ -1613,6 +1675,37 @@ begin
   houseAccount := AdoTableCurrentOwners.FieldValues['houseAcct'];
   adoTblMemoToLegal.FieldValues['houseAcct'] := houseAccount;
   adoTblMemoToLegal.FieldValues['memoDate'] := Date;
+end;
+
+procedure TMainForm.adoTblPropInLegalAfterInsert(DataSet: TDataSet);
+var
+  myAcctNumber: Integer;
+begin
+  myAcctNumber := AdoTableCurrentOwners.FieldByName('houseAcct').AsInteger;
+  with adoTblPropInLegal do
+  begin
+    FieldValues['houseAcct'] := myAcctNumber;
+    FieldValues['startDate'] := Date;
+  end;
+end;
+
+procedure TMainForm.adoTblPropInLegalAfterScroll(DataSet: TDataSet);
+begin
+  adoTblLegalStatus.Filtered := False;
+
+  if not(adoTblPropInLegal.Active) then begin
+    ShowMessage('adoTblPropInLegal is NOT Active . . . Exiting');
+    Exit;
+  end;
+  try
+    adoTblLegalStatus.Filter := 'matterNumber = ' + IntToStr(adoTblPropInLegal.FieldByName('matterNumber').AsInteger);
+    adoTblLegalStatus.Filtered := True;
+    adoTblLegalStatus.Active := True;
+  except
+    // do something here
+  end;
+  sbLegalMatters.Panels[1].Text := 'Num of Records: ' + IntToStr(adoTblPropInLegal.RecordCount);
+  sbLegalMatters.Panels[2].Text := 'Record: ' + IntToStr(adoTblPropInLegal.RecNo);
 end;
 
 procedure TMainForm.adoTblWelcomeLettersAfterInsert(DataSet: TDataSet);
@@ -1923,6 +2016,7 @@ begin
   AdoDataSetOwners.CommandText := 'SELECT * FROM Owners WHERE houseAcct = ' +
     IntToStr(myHouse) + ' ORDER BY closeDate DESC;';
   AdoDataSetOwners.Active := True;
+
   // Change the query statement for the AC Application grid
   with AdoDataAllAppLetters do
   begin
@@ -1931,6 +2025,11 @@ begin
       IntToStr(myHouse) + ' ORDER BY houseAcct DESC, applicationDate DESC;';
     Active := True;
   end;
+
+  // Set the Legal Status dbGrids
+  adoTblPropInLegal.Filtered := False;
+  adoTblPropInLegal.Filter := 'houseAcct = ' + IntToStr(AdoTableCurrentOwners.FieldByName('houseAcct').AsInteger);
+  adoTblPropInLegal.Filtered := True;
 
   // Set the Status Bars text as appropriate
   sbViolations.Panels[0].Text := 'Total Records: ' +
@@ -2685,6 +2784,39 @@ begin
   dbGridHouses.Width := pnlHousesEnter.Width - 2 * margin;
 end;
 
+procedure TMainForm.pnlLegalMattersResize(Sender: TObject);
+var
+  margin: Integer;
+begin
+  // memoSpacing := 24;
+  // bottomSpacing := 10;
+  // gutter := 30;
+  margin := 5;
+  Label9.Left := (pnlLegalMatters.Width - Label9.Width) div 2;
+  dbGridLegalMatters.Left := margin;
+  dbGridLegalMatters.Height := pnlLegalMatters.Height - dbGridLegalMatters.Top -
+    sbLegalMatters.Height - margin;
+  dbMemoLegalMatters.Width := pnlLegalMatters.Width - dbMemoLegalMatters.Left - margin;
+  dbMemoLegalMatters.Height := dbGridLegalMatters.Height;
+end;
+
+procedure TMainForm.pnlLegalMatterStatusResize(Sender: TObject);
+var
+  margin: Integer;
+begin
+  // memoSpacing := 24;
+  // bottomSpacing := 10;
+  // gutter := 30;
+  margin := 5;
+  Label10.Left := (pnlLegalMatterStatus.Width - Label10.Width) div 2;
+  dbGridLegalMatterStatus.Left := margin;
+  dbGridLegalMatterStatus.Height := pnlLegalMatterStatus.Height - dbGridLegalMatterStatus.Top -
+    sbLegalMatterStatus.Height - margin;
+  dbMemoLegalMatterStatus.Width := pnlLegalMatterStatus.Width - dbMemoLegalMatterStatus.Left - margin;
+  dbMemoLegalMatterStatus.Height := dbGridLegalMatterStatus.Height;
+  dbnavLegalStatUpdate.Left := pnlLegalMatterStatus.Width - 2* Margin - dbnavLegalStatUpdate.Width;
+end;
+
 procedure TMainForm.pnlOwnersEnterResize(Sender: TObject);
 var
   margin: Integer;
@@ -2693,7 +2825,7 @@ begin
   // bottomSpacing := 10;
   // gutter := 30;
   margin := 5;
-  Label19.Left := (pnlOwnersEnter.Width - Label19.Height) div 2;
+  Label19.Left := (pnlOwnersEnter.Width - Label19.Width) div 2;
   DBGrid6.Left := margin;
   DBGrid6.Height := pnlOwnersEnter.Height - DBGrid6.Top -
     sbOwners.Height - margin;
@@ -2708,7 +2840,7 @@ begin
   // bottomSpacing := 10;
   // gutter := 30;
   margin := 5;
-  Label20.Left := (pnlWelcomeEnter.Width - Label20.Height) div 2;
+  Label20.Left := (pnlWelcomeEnter.Width - Label20.Width) div 2;
   DBGrid7.Left := margin;
   DBGrid7.Height := pnlWelcomeEnter.Height - DBGrid7.Top - margin;
   DBGrid7.Width := pnlWelcomeEnter.Width - 2 * margin;
@@ -2894,7 +3026,7 @@ begin
     5:
       cTabColor := clActiveCaption;
     6:
-      cTabColor := clBtnFace;
+      cTabColor := $0066B5BB;         // pnlLegalMatterStatus
     7:
       cTabColor := $00EEC29B;        // pnlGenLetters1
     8:
