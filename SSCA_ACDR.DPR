@@ -22,7 +22,7 @@ begin
   SplashScn.Update;
   Application.CreateForm(TMainForm, MainForm);
   Application.CreateForm(TAboutBox, AboutBox);
-  while not SplashScn.Completed do
+  While not SplashScn.Completed do
     Application.ProcessMessages;
   SplashScn.Hide;
   SplashScn.Free;

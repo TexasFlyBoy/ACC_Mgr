@@ -365,7 +365,6 @@ type
     AdoDataSetViolationshouseAcct: TIntegerField;
     AdoDataSetViolationsviolationDate: TDateTimeField;
     AdoDataSetViolationsreason: TMemoField;
-    AdoDataSetViolationsaction: TWideStringField;
     AdoDataSetViolationsreportedBy: TWideStringField;
     AdoDataSetViolationsopenDate: TDateTimeField;
     AdoDataSetViolationscloseDate: TDateTimeField;
@@ -488,6 +487,26 @@ type
     adoTblLegalStatusmatterNumber: TIntegerField;
     adoTblLegalStatusstatusText: TWideMemoField;
     adoTblLegalStatusstatusDate: TDateTimeField;
+    AdoDataSetViolationsviolationAction: TWideStringField;
+    TabSheet1: TTabSheet;
+    adoTblAcc: TADOTable;
+    dsAcc: TDataSource;
+    pnlAcc: TPanel;
+    DBNavigator1: TDBNavigator;
+    dbgridAcc: TDBGrid;
+    sbAcc: TStatusBar;
+    sbAccAcct: TSpeedButton;
+    sbAccPlace: TSpeedButton;
+    sbAccFirst: TSpeedButton;
+    sbAccLast: TSpeedButton;
+    sbAccRoute: TSpeedButton;
+    sbAccTermStart: TSpeedButton;
+    sbAccTermEnd: TSpeedButton;
+    sbAccResign: TSpeedButton;
+    cbResign: TCheckBox;
+    ADODataSet1: TADODataSet;
+    cbEnd: TCheckBox;
+    cbCurrent: TCheckBox;
     procedure FormCreate(Sender: TObject);
     procedure ShowHint(Sender: TObject);
     procedure FileNew(Sender: TObject);
@@ -610,7 +629,6 @@ type
     procedure ADOQuery1AfterScroll(DataSet: TDataSet);
     procedure adoTblBrowseGenVioLettersAfterScroll(DataSet: TDataSet);
     procedure Button1Click(Sender: TObject);
-    procedure DBGrid2DblClick(Sender: TObject);
     procedure dbgridAllOwnersCellClick(Column: TColumn);
     procedure btnRunSqlClick(Sender: TObject);
     procedure btnShowSqlClick(Sender: TObject);
@@ -625,6 +643,20 @@ type
     procedure sbLegalStatusDateSortClick(Sender: TObject);
     procedure adoTblPropInLegalAfterInsert(DataSet: TDataSet);
     procedure adoTblLegalStatusAfterInsert(DataSet: TDataSet);
+    procedure dbGridSqlViewCellClick(Column: TColumn);
+    procedure pnlAccResize(Sender: TObject);
+    procedure sbAccAcctClick(Sender: TObject);
+    procedure sbAccPlaceClick(Sender: TObject);
+    procedure sbAccFirstClick(Sender: TObject);
+    procedure sbAccLastClick(Sender: TObject);
+    procedure sbAccRouteClick(Sender: TObject);
+    procedure sbAccTermStartClick(Sender: TObject);
+    procedure sbAccTermEndClick(Sender: TObject);
+    procedure sbAccResignClick(Sender: TObject);
+    procedure dbgridAccCellClick(Column: TColumn);
+    procedure cbResignClick(Sender: TObject);
+    procedure cbEndClick(Sender: TObject);
+    procedure cbCurrentClick(Sender: TObject);
 
   private
     procedure SortColumn(DataTable: TADOTable; IndexFieldName: string;
@@ -1374,6 +1406,49 @@ begin
  adoTblPropInLegal.Active := True;
 end;
 
+procedure TMainForm.cbCurrentClick(Sender: TObject);
+begin
+  ADODataSet1.Active := False;
+  ADODataSet1.Filtered := False;
+  cbResign.Checked := False;
+  cbEnd.Checked := False;
+  if (cbCurrent.Checked) then
+    ADODataSet1.CommandText := 'SELECT * FROM acdrCommittee WHERE termEnd > DATE() AND resignDate IS NULL'
+  else
+    ADODataSet1.CommandText := 'SELECT * FROM acdrCommittee';
+  ADODataSet1.Active := True;
+  sbAcc.Panels[0].Text := 'Records: ' + IntToStr(ADODataSet1.RecordCount);
+end;
+
+procedure TMainForm.cbEndClick(Sender: TObject);
+begin
+  ADODataSet1.Active := False;
+  ADODataSet1.Filtered := False;
+  cbResign.Checked := False;
+  cbCurrent.Checked := False;
+  if (cbEnd.Checked) then
+    ADODataSet1.CommandText := 'SELECT * FROM acdrCommittee WHERE termEnd > DATE()'
+  else
+    ADODataSet1.CommandText := 'SELECT * FROM acdrCommittee';
+  ADODataSet1.Active := True;
+  sbAcc.Panels[0].Text := 'Records: ' + IntToStr(ADODataSet1.RecordCount);
+end;
+
+
+procedure TMainForm.cbResignClick(Sender: TObject);
+begin
+  ADODataSet1.Active := False;
+  ADODataSet1.Filtered := False;
+  cbEnd.Checked := False;
+  cbCurrent.Checked := False;
+  if (cbResign.Checked) then
+    ADODataSet1.CommandText := 'SELECT * FROM acdrCommittee WHERE resignDate IS NULL'
+  else
+    ADODataSet1.CommandText := 'SELECT * FROM acdrCommittee';
+  ADODataSet1.Active := True;
+  sbAcc.Panels[0].Text := 'Records: ' + IntToStr(ADODataSet1.RecordCount);
+end;
+
 procedure TMainForm.sbAppLetterSortClick(Sender: TObject);
 begin
   BuildSortAppTableQuery('letterDate', sbAppLetterSort);
@@ -1570,24 +1645,15 @@ begin
     RichEdit1.selAttributes.Assign(FontDialog1.font);
 end;
 
+
+
 procedure TMainForm.dbGridAllLettersCellClick(Column: TColumn);
 var
-  presX, presY: Integer;
-  r: TRect;
+  theAcct: Integer;
 begin
-  presX := GetDeviceCaps(printer.handle, LOGPIXELSX);
-  presY := GetDeviceCaps(printer.handle, LOGPIXELSY);
-  // ShowMessage('presX =' + IntToStr(presX));
-  // ShowMessage('presY =' + IntToStr(presY));
-  with r do
-  begin
-    Left := 5 * presX; // 1.0" ft Margin
-    Top := 25 * presY div 2; // 2.5" Top Margin
-    Right := printer.PageWidth - (3 * presX div 4); // 0.75" Right Margin
-    Bottom := printer.PageHeight - (3 * presY div 2); // 1.50" Bottom Margin
-    // ShowMessage('left:' + IntToStr(left) +'     Top:' + IntToStr(Top) +'      Right:' + IntToStr(Right) +'     Bottom:' + IntToStr(Bottom));
-  end;
-  RichEdit1.PageRect := r;
+  theAcct := dbGridAllLetters.DataSource.DataSet.FieldByName('houseAcct').AsInteger;
+  eCurrentAcctSearch.Text := adoTblAllLetters.FieldValues['houseAcct'];
+  eCurrentAcctSearchChange(Column);
   with RichEdit1.Lines do
   begin
     Clear;
@@ -1601,6 +1667,55 @@ procedure TMainForm.sbVioNumClick(Sender: TObject);
 begin
   SortColumn(adoTblBrowseGenVioLetters, 'violationId', sbVioNum);
 end;
+
+procedure TMainForm.sbAccAcctClick(Sender: TObject);
+begin
+  SortColumn(ADODataSet1, 'houseAcct', sbAccAcct);
+end;
+
+procedure TMainForm.sbAccPlaceClick(Sender: TObject);
+begin
+  SortColumn(ADODataSet1, 'place', sbAccPlace);
+end;
+
+procedure TMainForm.sbAccFirstClick(Sender: TObject);
+begin
+  SortColumn(ADODataSet1, 'first', sbAccFirst);
+end;
+
+procedure TMainForm.sbAccLastClick(Sender: TObject);
+begin
+  SortColumn(ADODataSet1, 'last', sbAccLast);
+end;
+
+procedure TMainForm.sbAccRouteClick(Sender: TObject);
+begin
+          SortColumn(ADODataSet1, 'route', sbAccRoute);
+end;
+
+procedure TMainForm.sbAccTermStartClick(Sender: TObject);
+begin
+         SortColumn(ADODataSet1, 'termStart', sbAccTermStart);
+end;
+
+procedure TMainForm.sbAccTermEndClick(Sender: TObject);
+begin
+         SortColumn(ADODataSet1, 'termEnd', sbAccTermEnd);
+end;
+
+procedure TMainForm.sbAccResignClick(Sender: TObject);
+begin
+          SortColumn(ADODataSet1, 'resignDate', sbAccResign);
+end;
+
+procedure TMainForm.dbgridAccCellClick(Column: TColumn);
+ var
+  i: Integer;
+begin
+for I := 0 to dbgridAcc.Columns.Count - 1 do
+ dbgridAcc.Columns[i].Width := 70;
+end;
+
 
 procedure TMainForm.sbAcctNumClick(Sender: TObject);
 begin
@@ -1633,7 +1748,15 @@ begin
   eCurrentAcctSearchChange(Column);
 end;
 
-{ ----------------------------------------------------------------------+
+procedure TMainForm.dbGridSqlViewCellClick(Column: TColumn);
+begin
+  eCurrentAcctSearch.Text := adoQryCullLetters.FieldValues['houseAcct'];
+  eCurrentAcctSearchChange(Column);
+end;
+
+
+
+{/* ----------------------------------------------------------------------+
   DBGrid3CellClick():
   This procedure finds the houseAcct value of the current record
   in the All_AC_Apps grid and copies it to the "Acct Search" TEdit
@@ -1763,6 +1886,7 @@ procedure TMainForm.SortColumn(DataTable: TADOTable; IndexFieldName: string;
   PushButton: TSpeedButton);
 begin
   DataTable.Filtered := False;
+  DataTable.Filter :='';
   // TODO -- Remove all the speedbutton glyphs here
   PushButton.Glyph.Assign(nil);
   if (PushButton.Tag = 1) then
@@ -2228,6 +2352,9 @@ begin
     begin
       thisLetterNum := adoQryRunLetters.FieldValues['letterNumber'];
       thisLetterType := adoQryRunLetters.FieldValues['letterType'];
+      Application.ProcessMessages;
+      statBarGenLetters.Panels[4].Text := OnOffSite + ': ' + thisLetterType + ': ' + thisLetterNum;
+      Application.ProcessMessages;
       with adoQryClearLetters do
       begin
         SQL.Clear;
@@ -2295,6 +2422,11 @@ begin
   OnOffSite := 'OnSite';
   for k := 1 to 2 do
   begin
+    thisLetterNum := 'ACC Approval';
+    thisLetterType := '';
+    Application.ProcessMessages;
+    statBarGenLetters.Panels[4].Text := OnOffSite + ': ' + thisLetterType + ': ' + thisLetterNum;
+    Application.ProcessMessages;
     with adoQryClearLetters do
     begin
       SQL.Clear;
@@ -2318,41 +2450,56 @@ begin
   end; // for k
 
   { Do the AC Application Rejection Letters }
+  { First we grab all the rejection letter types }
+  {   -- These have negative permit numbers      }
+  with adoQryRunLetters do
+  begin
+    SQL.Clear;
+    SQL.Append
+      ('SELECT DISTINCT ABS(permitNumber) as rejectType FROM ApprovalLetters ');
+    SQL.Append('WHERE permitNumber < 0;');
+    ExecSQL;
+    Active := True;
+  end;
+  {--------------------------------------------------------------}
   OnOffSite := 'OnSite';
   for k := 1 to 2 do
   begin
-    rejectType := '22';
-    for i := 1 to 5 do
+    adoQryRunLetters.First;
+    for i := 1 to adoQryRunLetters.RecordCount do
     begin
       with adoQryClearLetters do
       begin
         SQL.Clear;
-        sqlText.LoadFromFile(sqlDirectory + 'ApprovalHeader.SQL');
-        SQL.AddStrings(sqlText);
-        sqlText.LoadFromFile(sqlDirectory + 'Reject' + rejectType + OnOffSite
-          + '.SQL');
-        SQL.AddStrings(sqlText);
-        sqlText.LoadFromFile(sqlDirectory + 'Reject' + rejectType + OnOffSite +
-          'From.SQL');
-        SQL.AddStrings(sqlText);
-        { Delete the comment lines from the SQL lines }
-        for j := (SQL.Count - 1) downto 0 do
-          if (AnsiLeftStr(SQL[j], 2) = '/*') then
-            SQL.Delete(j);
-        { Save the SQL to a local file for troubleshooting purposes }
-        SQL.SaveToFile(sqlDirectory + 'ZZ_' + 'Reject' + rejectType + OnOffSite
-          + '.SQL');
-        Prepared := True;
-        ExecSQL;
+        try
+          thisLetterNum := 'ACC Rejection';
+          thisLetterType := adoQryRunLetters.FieldValues['rejectType'];
+          Application.ProcessMessages;
+          statBarGenLetters.Panels[4].Text := OnOffSite + ': ' + thisLetterType + ': ' + thisLetterNum;
+          Application.ProcessMessages;
+          rejectType := adoQryRunLetters.FieldByName('rejectType').AsString;
+          sqlText.LoadFromFile(sqlDirectory + 'ApprovalHeader.SQL');
+          SQL.AddStrings(sqlText);
+          sqlText.LoadFromFile(sqlDirectory + 'Reject' + rejectType + OnOffSite
+            + '.SQL');
+          SQL.AddStrings(sqlText);
+          sqlText.LoadFromFile(sqlDirectory + 'Reject' + rejectType + OnOffSite +
+            'From.SQL');
+          SQL.AddStrings(sqlText);
+          { Delete the comment lines from the SQL lines }
+          for j := (SQL.Count - 1) downto 0 do
+            if (AnsiLeftStr(SQL[j], 2) = '/*') then
+              SQL.Delete(j);
+          { Save the SQL to a local file for troubleshooting purposes }
+          SQL.SaveToFile(sqlDirectory + 'ZZ_' + 'Reject' + rejectType + OnOffSite
+            + '.SQL');
+          Prepared := True;
+          ExecSQL;
+        except
+          //do something here
+        end;
       end; // with adoQryClearLetters
-      if (i = 1) then
-        rejectType := '24'
-      else if (i = 2) then
-        rejectType := '33'
-      else if (i = 3) then
-        rejectType := '55'
-      else
-        rejectType := '10';
+      adoQryRunLetters.Next;
     end; // for i
     // Now we run the OFFSITE letters
     OnOffSite := 'OffSite';
@@ -2871,7 +3018,6 @@ begin
   dbGridAllLetters.Width := pnlGenLetters1.Width - 2 * margin;
   dbGridAllLetters.Height := pnlGenLetters1.Height - dbGridAllLetters.Top -
     statBarGenLetters.Height - margin;
-
 end;
 
 procedure TMainForm.tsGenLettersResize(Sender: TObject);
@@ -2909,7 +3055,20 @@ begin
 
 end;
 
-{ ----------------------------------------------------------------------+
+procedure TMainForm.pnlAccResize(Sender: TObject);
+var
+  margin: Integer;
+begin
+  // memoSpacing := 24;
+  // bottomSpacing := 10;
+  // gutter := 30;
+  margin := 5;
+  dbgridAcc.Width := pnlAcc.Width - 2 * margin;
+  dbgridAcc.Height := pnlAcc.Height - dbgridAcc.Top -
+    sbAcc.Height - margin;
+end;
+
+ (*----------------------------------------------------------------------+
   AdoDataAllAppLettersAfterInsert:
   This is a procedure to append a new record to the ApprovalLetters
   table. Several fields are populated:
@@ -2918,7 +3077,7 @@ end;
   specificApprovalWords  : 'Specific Approval Words'
   specificRejectionWords : 'Specific Rejection Words'
   RemedyWords            : 'Remedy Words'
-  +----------------------------------------------------------------------- }
+  +-----------------------------------------------------------------------*)
 procedure TMainForm.AdoDataAllAppLettersAfterInsert(DataSet: TDataSet);
 var
   myHouseAcct: Integer;
@@ -3259,12 +3418,10 @@ begin
   eCurrentAcctSearchChange(Column);
 end;
 
-procedure TMainForm.DBGrid2DblClick(Sender: TObject);
-begin
 
-end;
 
 //{$INCLUDE ini_file.pas}
+
 
 
 
