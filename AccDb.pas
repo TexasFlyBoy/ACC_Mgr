@@ -35,7 +35,8 @@ begin
       adoTblMemoToLegal.Active := Connect;
       adoTblPropInLegal.Active := Connect;
       adoTblLegalStatus.Active := Connect;
-
+      adoTblAcc.Active         := Connect;
+      ADODataSet1.Active       := Connect;
       MakeConnection := True;
     end;
   except

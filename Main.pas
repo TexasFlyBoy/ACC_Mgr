@@ -7,7 +7,8 @@ uses
   Forms, Dialogs, StdCtrls, Buttons, ExtCtrls, Menus, ComCtrls, DB, ADODB,
   Grids, DBGrids, DBCtrls, XPStyleActnCtrls, ActnList, ActnMan, ToolWin,
   ActnCtrls, Access2000, OleServer, DateUtils,
-  RichEdit, Printers, ImgList, Math, System.ImageList, Registry, Inifiles, all_letters, sql_query;
+  RichEdit, Printers, ImgList, Math, System.ImageList, Registry, Inifiles, all_letters, sql_query,
+  JRO_TLB;
 
 type
   TMainForm = class(TForm)
@@ -507,6 +508,7 @@ type
     ADODataSet1: TADODataSet;
     cbEnd: TCheckBox;
     cbCurrent: TCheckBox;
+    Replica1: TReplica;
     procedure FormCreate(Sender: TObject);
     procedure ShowHint(Sender: TObject);
     procedure FileNew(Sender: TObject);
@@ -2362,7 +2364,8 @@ begin
         begin
           sqlText.LoadFromFile(sqlDirectory + OnOffSite + 'CertHeader.SQL');
           SQL.AddStrings(sqlText);
-          sqlText.LoadFromFile(sqlDirectory + 'GEN_209.SQL');
+          sqlText.LoadFromFile(sqlDirectory + thisLetterType + '_' +
+            thisLetterNum + '.SQL');
           SQL.AddStrings(sqlText);
           sqlText.LoadFromFile(sqlDirectory + OnOffSite + 'From209.SQL');
           SQL.AddStrings(sqlText);
@@ -2392,16 +2395,13 @@ begin
         end;
         { Delete the comment lines from the SQL lines }
         for j := (SQL.Count - 1) downto 0 do
-          if (AnsiLeftStr(SQL[j], 2) = '/*') then
+          if (AnsiLeftStr(Trim(SQL[j]), 2) = '/*') then
             SQL.Delete(j);
         { Save the SQL to a local file for troubleshooting purposes }
         SQL.SaveToFile(sqlDirectory + 'ZZ_' + thisLetterType + '_' +
-          thisLetterNum + '.SQL');
-        if (thisLetterNum <> '209') then
-        begin
+          thisLetterNum + '_' + OnOffSite + '.SQL');
           Parameters.ParamByName('L_TYPE').value := thisLetterType;
           Parameters.ParamByName('L_NUMBER').value := thisLetterNum;
-        end;
         Prepared := True;
         ExecSQL;
         { Do the next letter }
