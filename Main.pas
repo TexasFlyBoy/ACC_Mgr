@@ -1834,10 +1834,15 @@ begin
 end;
 
 procedure TMainForm.adoTblWelcomeLettersAfterInsert(DataSet: TDataSet);
+var
+  welcomeChairName: OleVariant;
+  welcomeChair: string;
 begin
   with adoTblWelcomeLetters do
   begin
     FieldValues['letterDate'] := Date;
+    WelcomeChairName := ReadIniString('Welcome\Chair','WelcomeSign');
+    FieldValues['whoFrom'] := WelcomeChairName;
   end;
 end;
 

@@ -2939,7 +2939,7 @@ object SplashScn: TSplashScn
     Width = 201
     Height = 20
     Alignment = taCenter
-    Caption = 'Copyright: Steve Arrieta 2018'
+    Caption = 'Copyright: Steve Arrieta 2019'
     Color = clBlack
     Font.Charset = DEFAULT_CHARSET
     Font.Color = clYellow
@@ -2997,10 +2997,10 @@ object SplashScn: TSplashScn
   object StaticText4: TStaticText
     Left = 22
     Top = 381
-    Width = 77
+    Width = 97
     Height = 20
     Alignment = taCenter
-    Caption = 'Version 2.4'
+    Caption = ' Version 2.4.1 '
     Color = clBlack
     Font.Charset = DEFAULT_CHARSET
     Font.Color = clYellow

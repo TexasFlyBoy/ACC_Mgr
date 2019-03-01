@@ -3217,9 +3217,9 @@ object AboutBox: TAboutBox
     object Version: TLabel
       Left = 152
       Top = 64
-      Width = 92
+      Width = 112
       Height = 20
-      Caption = 'Version 2.4'
+      Caption = 'Version 2.4.1 '
       Font.Charset = DEFAULT_CHARSET
       Font.Color = clYellow
       Font.Height = -16
@@ -3234,7 +3234,7 @@ object AboutBox: TAboutBox
       Top = 336
       Width = 197
       Height = 16
-      Caption = 'Copyright 2018 Steve Arrieta'
+      Caption = 'Copyright 2019 Steve Arrieta'
       Color = clBlack
       Font.Charset = DEFAULT_CHARSET
       Font.Color = clYellow

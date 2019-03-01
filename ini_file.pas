@@ -70,6 +70,8 @@ begin
 
     Ini.WriteString('sql\Directory','AutoFormat', '');
 
+    Ini.WriteString('Welcome\Chair','WelcomeSign', 'Bozo D. Clown');
+
   finally
     Ini.Free;
   end;
