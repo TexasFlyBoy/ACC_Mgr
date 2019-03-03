@@ -539,7 +539,6 @@ type
     procedure eCurrentAcctSearchChange(Sender: TObject);
     procedure eCurrentStreetSearchChange(Sender: TObject);
     procedure eCurrentAddrSearchChange(Sender: TObject);
-    procedure sbCopyGenVioLetterClick(Sender: TObject);
     procedure sbAcctSortClick(Sender: TObject);
     procedure sbOwnerSortClick(Sender: TObject);
     procedure sbStrNumSortClick(Sender: TObject);
@@ -664,6 +663,7 @@ type
     procedure cbEndClick(Sender: TObject);
     procedure cbCurrentClick(Sender: TObject);
     procedure sbAccNumSortClick(Sender: TObject);
+    procedure eCurrentAccNumSearchChange(Sender: TObject);
 
   private
     procedure SortColumn(DataTable: TADOTable; IndexFieldName: string;
@@ -677,9 +677,9 @@ type
       const ReopenCOnnection: Boolean = True);
     procedure JroRefreshCache(ADOConnection: TADOConnection);
     procedure JroCompactDatabase(const Source, Destination: string);
-    procedure UpdateCurrentHouseAcct(newHouseAcct: string);
-    procedure SortColumnMod(DataSet: TADODataSet; IndexFieldName: string;
-      PushButton: TSpeedButton); overload;
+    procedure UpdateCurrentHouseAcct(dbField: string; newHouseAcct: string);
+//    procedure SortColumnMod(DataSet: TADODataSet; IndexFieldName: string;
+  //    PushButton: TSpeedButton); overload;
     procedure SortColumnMod(DataTable: TADOTable; IndexFieldName: string;
       PushButton: TSpeedButton); overload;
 
@@ -897,14 +897,13 @@ begin
 end;
 
 procedure TMainForm.EditColorChangeOnEnter(Sender: TObject);
+var
+  i: Integer;
 begin
   TEdit(Sender).Color := clMoneyGreen;
-  eCurrentAcctSearch.Text := '';
-  eCurrentStreetSearch.Text := '';
-  eCurrentAddrSearch.Text := '';
-  eCurrentRouteSearch.Text := '';
-  eCurrentOwnerSearch.Text := '';
-  eCurrentPhoneSearch.Text := '';
+  for I := 0 to pnlCurrentOwners.ControlCount - 1 do
+    if pnlCurrentOwners.Controls[i] is TEdit then
+      TEdit(pnlCurrentOwners.Controls[i]).Text := '';
 end;
 
 procedure TMainForm.EditColorChangeOnExit(Sender: TObject);
@@ -972,13 +971,23 @@ begin
 end;
 
 { ----------------------------------------------------------------------+
+  eCurrentAccNumSearchChange:
+  This procedure is called when the user changes the CurrentAccAcct
+  search box.
+  +----------------------------------------------------------------------- }
+procedure TMainForm.eCurrentAccNumSearchChange(Sender: TObject);
+begin
+  UpdateCurrentHouseAcct('accAccount', eCurrentAccNumSearch.Text);
+end;
+
+{ ----------------------------------------------------------------------+
   eCurrentAcctSearchChange:
   This procedure is called when the user changes the CurrentAcct
   search box.
   +----------------------------------------------------------------------- }
-procedure TMainForm.eCurrentAcctSearchChange(Sender: TObject);
+  procedure TMainForm.eCurrentAcctSearchChange(Sender: TObject);
 begin
-  UpdateCurrentHouseAcct(eCurrentAcctSearch.Text);
+  UpdateCurrentHouseAcct('houseAcct', eCurrentAcctSearch.Text);
 end;
 
 { ----------------------------------------------------------------------+
@@ -1010,14 +1019,6 @@ begin
   if (length(eCurrentAddrSearch.Text) > 0) then
     filterText := 'address like ' + '''' + eCurrentAddrSearch.Text + '%' + '''';
   TEditChange(filterText);
-end;
-
-procedure TMainForm.sbCopyGenVioLetterClick(Sender: TObject);
-var
-  vinNumber: Integer;
-begin
-  vinNumber := dsGenVioLetters.DataSet.FieldValues['violationId'];
-//  ShowMessage('VinNumber = ' + IntToStr(vinNumber));
 end;
 
 procedure TMainForm.sbAcctSortClick(Sender: TObject);
@@ -1381,8 +1382,6 @@ procedure TMainForm.Button1Click(Sender: TObject);
 var
   Ini: TIniFile;
   FileName: string;
-  myFile: TextFile;
-  data: string;
 begin
   CreateIniFile;
   Exit;
@@ -1503,8 +1502,6 @@ begin
 end;
 
 procedure TMainForm.sbLegalStatusDateSortClick(Sender: TObject);
-var
-  sortOrder: Integer;
 begin
   // Tag = 0 signifies ASC
   // Tag = 1 signifies DESC
@@ -1655,10 +1652,7 @@ end;
 
 
 procedure TMainForm.dbGridAllLettersCellClick(Column: TColumn);
-var
-  theAcct: Integer;
 begin
-  theAcct := dbGridAllLetters.DataSource.DataSet.FieldByName('houseAcct').AsInteger;
   eCurrentAcctSearch.Text := adoTblAllLetters.FieldValues['houseAcct'];
   eCurrentAcctSearchChange(Column);
   with RichEdit1.Lines do
@@ -1799,12 +1793,12 @@ end;
   +----------------------------------------------------------------------- }
 procedure TMainForm.DBGrid3CellClick(Column: TColumn);
 begin
-  UpdateCurrentHouseAcct(ADOQuery1.FieldValues['houseAcct']);
+  UpdateCurrentHouseAcct('houseAcct', ADOQuery1.FieldValues['houseAcct']);
 end;
 
 procedure TMainForm.adoTblBrowseGenVioLettersAfterScroll(DataSet: TDataSet);
 begin
-  UpdateCurrentHouseAcct(adoTblBrowseGenVioLetters.FieldValues['houseAcct']);
+  UpdateCurrentHouseAcct('houseAcct', adoTblBrowseGenVioLetters.FieldValues['houseAcct']);
 end;
 
 procedure TMainForm.adoTblLegalStatusAfterInsert(DataSet: TDataSet);
@@ -1869,7 +1863,6 @@ end;
 procedure TMainForm.adoTblWelcomeLettersAfterInsert(DataSet: TDataSet);
 var
   welcomeChairName: OleVariant;
-  welcomeChair: string;
 begin
   with adoTblWelcomeLetters do
   begin
@@ -1994,6 +1987,7 @@ begin
   sbPermitSort_GenLetters.Glyph.Assign(nil);
 end;
 
+{
 procedure TMainForm.SortColumnMod(DataSet: TADODataSet; IndexFieldName: string;
   PushButton: TSpeedButton);
 begin
@@ -2013,6 +2007,7 @@ begin
   end;
   DataSet.Filtered := True;
 end;
+}
 
 procedure TMainForm.SortColumnMod(DataTable: TADOTable; IndexFieldName: string;
   PushButton: TSpeedButton);
@@ -2341,7 +2336,7 @@ end;
 
 procedure TMainForm.ADOQuery1AfterScroll(DataSet: TDataSet);
 begin
-  UpdateCurrentHouseAcct(ADOQuery1.FieldValues['houseAcct']);
+  UpdateCurrentHouseAcct('houseAcct', ADOQuery1.FieldValues['houseAcct']);
 end;
 
 { ----------------------------------------------------------------------+
@@ -2353,7 +2348,7 @@ end;
 procedure TMainForm.btnRunLettersClick(Sender: TObject);
 var
   thisLetterNum, thisLetterType: string;
-  OnOffSite,autoFormatDir: string;
+  OnOffSite: string;
   sqlText: TStringList;
   sqlDirectory, rejectType: string;
   i, j, k: Integer;
@@ -2759,17 +2754,11 @@ end;
 procedure TMainForm.Connect1Click(Sender: TObject);
 var
   sConn, sSearch: WideString;
-  sourceStart, sourceEnd: Integer;
+  sourceStart: Integer;
 begin
   sConn := PromptDataSource(MainForm.handle, 'aaa');
-  // sConn := ADOConnection1.ConnectionString;
-//  ShowMessage(sConn);
   sSearch := 'Data Source=';
   sourceStart := Pos(sSearch, sConn, 0);
-  sourceEnd := PosEx(';', sConn, sourceStart + 1);
-//  ShowMessage('start = ' + IntToStr(sourceStart) + '    end = ' +
-//    IntToStr(sourceEnd));
-
 end;
 
 { ----------------------------------------------------------------------+
@@ -3281,13 +3270,13 @@ begin
   end;
 end;
 
-procedure TMainForm.UpdateCurrentHouseAcct(newHouseAcct: string);
+procedure TMainForm.UpdateCurrentHouseAcct(dbField: string; newHouseAcct: string);
 var
   filterText: string;
 begin
   filterText := '';
   if (length(newHouseAcct) > 0) then
-    filterText := 'houseAcct = ' + newHouseAcct;
+    filterText := dbField + ' = ' + newHouseAcct;
   TEditChange(filterText);
 end;
 

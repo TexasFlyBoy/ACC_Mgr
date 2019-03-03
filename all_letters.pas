@@ -35,6 +35,7 @@ function AllLettersColumnSetup: Boolean;
 var
   i, numOfColumns, numOfVisCol: Integer;
 begin
+  AllLettersColumnSetup := False;
   numOfColumns := 42;
   numOfVisCol := 12;
   with MainForm.dbGridAllLetters do begin

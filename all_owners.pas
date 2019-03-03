@@ -46,6 +46,7 @@ function AllOwnersColumnSetup(Setup: boolean): Boolean;
 var
   i: Integer;
 begin
+  AllOwnersColumnSetup := False;
   with MainForm.dbgridAllOwners do begin
 
     if Columns.Count > 0 then

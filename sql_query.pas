@@ -3,7 +3,7 @@ unit sql_query;
 interface
 
 uses
-  SysUtils, Classes, Graphics;
+  SysUtils, Classes, Graphics, data.db;
 
 procedure btnShowSqlClick1(Sender: TObject);
 procedure btnRunSqlClick;

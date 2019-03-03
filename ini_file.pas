@@ -26,8 +26,6 @@ procedure CreateIniFile;
 var
   Ini: TIniFile;
   fileName : string;
-  myFile   : TextFile;
-  data     : string;
 begin
   fileName := ChangeFileExt(Application.ExeName, '.INI' );
   if FileExists(fileName) then Exit;
@@ -97,8 +95,9 @@ end;
 function ReadIniString(section, key: string): string overload;
 var
   Ini: TIniFile;
-  fileName, value: string;
+  fileName: string;
 begin
+  Ini := nil;
   ReadIniString := '';
   filename := ChangeFileExt(Application.ExeName, '.ini');
   if FileExists(fileName) then begin
@@ -120,6 +119,7 @@ var
   Ini: TIniFile;
   fileName: string;
 begin
+  Ini := nil;
   ReadIniBoolean := False;
   filename := ChangeFileExt(Application.ExeName, '.ini');
   if FileExists(fileName) then begin
@@ -141,6 +141,7 @@ var
   Ini: TIniFile;
   fileName: string;
 begin
+  Ini := nil;
   ReadIniColor := 0;
   filename := ChangeFileExt(Application.ExeName, '.ini');
   if FileExists(fileName) then begin
@@ -171,6 +172,7 @@ var
   Ini: TIniFile;
   fileName: string;
 begin
+  Ini := nil;
   ReadIniDouble := 0.0;
   filename := ChangeFileExt(Application.ExeName, '.ini');
   if FileExists(fileName) then begin
@@ -192,6 +194,7 @@ var
   Ini: TIniFile;
   fileName: string;
 begin
+  Ini := nil;
   WriteIniString := False;
   filename := ChangeFileExt(Application.ExeName, '.ini');
   if not(FileExists(fileName)) then
@@ -216,6 +219,7 @@ var
   Ini: TIniFile;
   fileName: string;
 begin
+  Ini := nil;
   WriteIniBoolean := False;
   filename := ChangeFileExt(Application.ExeName, '.ini');
   if FileExists(fileName) then begin
@@ -238,6 +242,7 @@ var
   Ini: TIniFile;
   fileName: string;
 begin
+  Ini := nil;
   WriteIniColor := False;
   filename := ChangeFileExt(Application.ExeName, '.ini');
   if FileExists(fileName) then begin
@@ -269,6 +274,7 @@ var
   Ini: TIniFile;
   fileName: string;
 begin
+  Ini := nil;
   WriteIniDouble := False;
   filename := ChangeFileExt(Application.ExeName, '.ini');
   if FileExists(fileName) then begin
@@ -287,6 +293,7 @@ var
   Ini: TIniFile;
   myFileName, sqlDirName: string;
 begin
+  Ini := nil;
   if not(IniFileExists) then
     CreateIniFile;
 
