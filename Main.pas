@@ -509,6 +509,10 @@ type
     cbEnd: TCheckBox;
     cbCurrent: TCheckBox;
     Replica1: TReplica;
+    Label11: TLabel;
+    eCurrentAccNumSearch: TEdit;
+    sbAccNumSort: TSpeedButton;
+    AdoTableCurrentOwnersAccAccount: TIntegerField;
     procedure FormCreate(Sender: TObject);
     procedure ShowHint(Sender: TObject);
     procedure FileNew(Sender: TObject);
@@ -659,6 +663,7 @@ type
     procedure cbResignClick(Sender: TObject);
     procedure cbEndClick(Sender: TObject);
     procedure cbCurrentClick(Sender: TObject);
+    procedure sbAccNumSortClick(Sender: TObject);
 
   private
     procedure SortColumn(DataTable: TADOTable; IndexFieldName: string;
@@ -1690,24 +1695,52 @@ begin
   SortColumn(ADODataSet1, 'last', sbAccLast);
 end;
 
+procedure TMainForm.sbAccNumSortClick(Sender: TObject);
+//  SortColumn(ADODataSet1, 'accAccount', sbAccNumSort);
+//---------------------------------------------------------------
+
+var
+  numOfRecords: Integer;
+begin
+  AdoTableCurrentOwners.Filtered := False;
+  sbAccNumSort.Glyph.Assign(nil);
+  if (sbAccNumSort.Tag = 1) then
+  begin
+    AdoTableCurrentOwners.IndexFieldNames := 'accAccount ASC';
+    ImageList1.GetBitmap(1, sbAccNumSort.Glyph);
+    sbAccNumSort.Tag := 0;
+  end
+  else
+  begin
+    AdoTableCurrentOwners.IndexFieldNames := 'accAccount DESC';
+    ImageList1.GetBitmap(0, sbAccNumSort.Glyph);
+    sbAccNumSort.Tag := 1;
+  end;
+  AdoTableCurrentOwners.Filtered := True;
+  numOfRecords := AdoTableCurrentOwners.RecordCount;
+  sbCurrentOwners.Panels[1].Text := 'Record Count: ' + IntToStr(numOfRecords);
+end;
+
+//------------------------------------------------------------------
+
 procedure TMainForm.sbAccRouteClick(Sender: TObject);
 begin
-          SortColumn(ADODataSet1, 'route', sbAccRoute);
+  SortColumn(ADODataSet1, 'route', sbAccRoute);
 end;
 
 procedure TMainForm.sbAccTermStartClick(Sender: TObject);
 begin
-         SortColumn(ADODataSet1, 'termStart', sbAccTermStart);
+  SortColumn(ADODataSet1, 'termStart', sbAccTermStart);
 end;
 
 procedure TMainForm.sbAccTermEndClick(Sender: TObject);
 begin
-         SortColumn(ADODataSet1, 'termEnd', sbAccTermEnd);
+  SortColumn(ADODataSet1, 'termEnd', sbAccTermEnd);
 end;
 
 procedure TMainForm.sbAccResignClick(Sender: TObject);
 begin
-          SortColumn(ADODataSet1, 'resignDate', sbAccResign);
+  SortColumn(ADODataSet1, 'resignDate', sbAccResign);
 end;
 
 procedure TMainForm.dbgridAccCellClick(Column: TColumn);
