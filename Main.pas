@@ -508,7 +508,6 @@ type
     ADODataSet1: TADODataSet;
     cbEnd: TCheckBox;
     cbCurrent: TCheckBox;
-    Replica1: TReplica;
     Label11: TLabel;
     eCurrentAccNumSearch: TEdit;
     sbAccNumSort: TSpeedButton;
@@ -664,6 +663,9 @@ type
     procedure cbCurrentClick(Sender: TObject);
     procedure sbAccNumSortClick(Sender: TObject);
     procedure eCurrentAccNumSearchChange(Sender: TObject);
+    procedure adoQryCullLettersAfterScroll(DataSet: TDataSet);
+    procedure adoTableOwnersAfterScroll(DataSet: TDataSet);
+    procedure adoTblAllLettersAfterScroll(DataSet: TDataSet);
 
   private
     procedure SortColumn(DataTable: TADOTable; IndexFieldName: string;
@@ -1796,6 +1798,30 @@ begin
   UpdateCurrentHouseAcct('houseAcct', ADOQuery1.FieldValues['houseAcct']);
 end;
 
+procedure TMainForm.adoTableOwnersAfterScroll(DataSet: TDataSet);
+begin
+  try
+    UpdateCurrentHouseAcct('houseAcct', adoTableOwners.FieldValues['houseAcct'])
+  except
+    // do something here
+  end;
+end;
+
+procedure TMainForm.adoTblAllLettersAfterScroll(DataSet: TDataSet);
+begin
+  try
+    UpdateCurrentHouseAcct('houseAcct', adoTblAllLetters.FieldValues['houseAcct']);
+    with RichEdit1.Lines do
+    begin
+      Clear;
+      AddStrings(DBMemo14.Lines);
+      VertScrollBar.Position := 50;
+    end;
+  except
+    // do something here
+  end;
+end;
+
 procedure TMainForm.adoTblBrowseGenVioLettersAfterScroll(DataSet: TDataSet);
 begin
   UpdateCurrentHouseAcct('houseAcct', adoTblBrowseGenVioLetters.FieldValues['houseAcct']);
@@ -1860,6 +1886,13 @@ begin
   sbLegalMatters.Panels[2].Text := 'Record: ' + IntToStr(adoTblPropInLegal.RecNo);
 end;
 
+{ -------------------------------------------------------------------------+
+  adoTblWelcomeLettersAfterInsert():
+  This procedure executes after a new record is inserted but before the
+  user starts to edit the new record. It sets the letterDate to the
+  current date, the whoFrom to the Welcome/Chair-WelcomeSign from the
+  iniFile.
+  +----------------------------------------------------------------------- }
 procedure TMainForm.adoTblWelcomeLettersAfterInsert(DataSet: TDataSet);
 var
   welcomeChairName: OleVariant;
@@ -2332,6 +2365,15 @@ procedure TMainForm.AdoDataSetVioStatusAfterPost(DataSet: TDataSet);
 begin
   AdoDataSetVioStatus.Active := False;
   AdoDataSetVioStatus.Active := True;
+end;
+
+procedure TMainForm.adoQryCullLettersAfterScroll(DataSet: TDataSet);
+begin
+  try
+    UpdateCurrentHouseAcct('houseAcct', adoQryCullLetters.FieldValues['houseAcct'])
+  except
+    // do something here
+  end;
 end;
 
 procedure TMainForm.ADOQuery1AfterScroll(DataSet: TDataSet);

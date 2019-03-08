@@ -3000,7 +3000,7 @@ object SplashScn: TSplashScn
     Width = 97
     Height = 20
     Alignment = taCenter
-    Caption = ' Version 2.4.1 '
+    Caption = ' Version 2.4.2 '
     Color = clBlack
     Font.Charset = DEFAULT_CHARSET
     Font.Color = clYellow
