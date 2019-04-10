@@ -512,6 +512,12 @@ type
     eCurrentAccNumSearch: TEdit;
     sbAccNumSort: TSpeedButton;
     AdoTableCurrentOwnersAccAccount: TIntegerField;
+    BtnDRVio: TButton;
+    BtnFOL: TButton;
+    Btn2OL: TButton;
+    Btn3OL: TButton;
+    Btn4OL: TButton;
+    Btn209: TButton;
     procedure FormCreate(Sender: TObject);
     procedure ShowHint(Sender: TObject);
     procedure FileNew(Sender: TObject);
@@ -666,6 +672,8 @@ type
     procedure adoQryCullLettersAfterScroll(DataSet: TDataSet);
     procedure adoTableOwnersAfterScroll(DataSet: TDataSet);
     procedure adoTblAllLettersAfterScroll(DataSet: TDataSet);
+    procedure BtnDRVioClick(Sender: TObject);
+    procedure BtnOlClick(Sender: TObject);
 
   private
     procedure SortColumn(DataTable: TADOTable; IndexFieldName: string;
@@ -1576,7 +1584,17 @@ begin
   statBarUpdate;
 end;
 
-{ ----------------------------------------------------------------------+
+{procedure TMainForm.BtnDRVioClick(Sender: TObject);
+begin
+
+end;
+
+procedure TMainForm.BtnDRVioClick(Sender: TObject);
+begin
+
+end;
+
+ ----------------------------------------------------------------------+
   btnOpenSqlClick():
   This procedure allows the user to select a SQL file for
   execution. The SQL file must be 100% self-contained.
@@ -2285,13 +2303,71 @@ end;
 procedure TMainForm.AdoDataSetVioStatusAfterInsert(DataSet: TDataSet);
 var
   myVioNumber: Integer;
+  statDate: string;
+  theDate: TDateTime;
 begin
+  statDate := ReadIniString('VioStatus\Defaults','StatusDate');
+  if (Trim(LowerCase(statDate)) = 'now') then theDate := Date
+  else theDate := StrToDateTime(statDate);
+
   myVioNumber := dbGridViolations.DataSource.DataSet.FieldValues['violationID'];
   with AdoDataSetVioStatus do
   begin
     FieldValues['violationNumber'] := myVioNumber;
-    FieldValues['statusDate'] := Date;
-    FieldValues['statusBy'] := 'BOZO';
+    FieldValues['statusDate'] := TheDate;
+    FieldValues['statusBy'] := ReadIniString('VioStatus\Defaults','by');
+    FieldValues['status'] := ReadIniString('VioStatus\Defaults','status');
+  end;
+end;
+
+
+procedure TMainForm.BtnDRVioClick(Sender: TObject);
+var
+  myVioNumber: Integer;
+  statDate: string;
+  theDate: TDateTime;
+begin
+  statDate := ReadIniString('VioStatus\Defaults','DrDate');
+  if (Trim(LowerCase(statDate)) = 'now') then theDate := Date
+  else theDate := StrToDateTime(statDate);
+
+  myVioNumber := dbGridViolations.DataSource.DataSet.FieldValues['violationID'];
+  with AdoDataSetVioStatus do
+  begin
+    Insert;
+    FieldValues['violationNumber'] := myVioNumber;
+    FieldValues['statusDate'] := TheDate;
+    FieldValues['statusBy'] := ReadIniString('VioStatus\Defaults','DrDriver');
+    FieldValues['status'] := ReadIniString('VioStatus\Defaults','DrStatus');
+  end;
+end;
+
+procedure TMainForm.BtnOlClick(Sender: TObject);
+var
+  myVioNumber,letterNumber: Integer;
+  statDate, statAction: string;
+  theDate: TDateTime;
+begin
+  case TButton(Sender).Tag of
+    1: statAction := ReadIniString('VioStatus\Defaults','FolAction');
+    2: statAction := ReadIniString('VioStatus\Defaults','2olAction');
+    3: statAction := ReadIniString('VioStatus\Defaults','3olAction');
+    4: statAction := ReadIniString('VioStatus\Defaults','4olAction');
+    5: statAction := ReadIniString('VioStatus\Defaults','209Action');
+  end;
+  statDate := ReadIniString('VioStatus\Defaults','OlDate');
+  if (Trim(LowerCase(statDate)) = 'now') then theDate := Date
+  else theDate := StrToDateTime(statDate);
+
+  myVioNumber := dbGridViolations.DataSource.DataSet.FieldValues['violationID'];
+  with AdoDataSetVioStatus do
+  begin
+    Insert;
+    FieldValues['violationNumber'] := myVioNumber;
+    FieldValues['statusDate'] := TheDate;
+    FieldValues['statusBy'] := ReadIniString('VioStatus\Defaults','OlBy');
+    FieldValues['statusAction'] := statAction;
+    FieldValues['status'] := '';
   end;
 end;
 
