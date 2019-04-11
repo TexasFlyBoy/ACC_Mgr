@@ -66,6 +66,20 @@ begin
     Ini.WriteString('VioLetters\Defaults','4OLSignLine', 'Bozo D. Clown');
     Ini.WriteString('VioLetters\Defaults','209SignLine', 'Bozo Dee Clown');
 
+    Ini.WriteString('VioStatus\Defaults','drDate', '12/25/1916');
+    Ini.WriteString('VioStatus\Defaults','drBy', 'Paciano');
+    Ini.WriteString('VioStatus\Defaults','drStatus', 'Took Photo(s)');
+    Ini.WriteString('VioStatus\Defaults','OL1 Action', 'Sent FOL.');
+    Ini.WriteString('VioStatus\Defaults','OL2 Action', 'Sent 2OL.');
+    Ini.WriteString('VioStatus\Defaults','OL3 Action', 'Sent 3OL.');
+    Ini.WriteString('VioStatus\Defaults','OL4 Action', 'Sent 4OL.');
+    Ini.WriteString('VioStatus\Defaults','OL5 Action', 'Sent 209 Letter.');
+    Ini.WriteString('VioStatus\Defaults','OL By', 'mickey');
+    Ini.WriteString('VioStatus\Defaults','OL Date', 'Now');
+    Ini.WriteString('VioStatus\Defaults','Insert Date', '10/14/1066');
+    Ini.WriteString('VioStatus\Defaults','Insert By', 'goofy');
+    Ini.WriteString('VioStatus\Defaults','Insert Status', 'blah');
+
     Ini.WriteString('sql\Directory','AutoFormat', '');
 
     Ini.WriteString('Welcome\Chair','WelcomeSign', 'Bozo D. Clown');

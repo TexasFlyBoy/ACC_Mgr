@@ -166,9 +166,9 @@
                 <Platform value="Win64">False</Platform>
             </Platforms>
             <Deployment Version="3">
-                <DeployFile LocalName="ModelSupport_SSCA_ACDR\About\default.txvpck" Configuration="Debug" Class="ProjectFile">
+                <DeployFile LocalName="SSCA_ACDR.exe" Configuration="Debug" Class="ProjectOutput">
                     <Platform Name="Win32">
-                        <RemoteDir>.\</RemoteDir>
+                        <RemoteName>SSCA_ACDR.exe</RemoteName>
                         <Overwrite>true</Overwrite>
                     </Platform>
                 </DeployFile>
@@ -190,9 +190,9 @@
                         <Overwrite>true</Overwrite>
                     </Platform>
                 </DeployFile>
-                <DeployFile LocalName="SSCA_ACDR.exe" Configuration="Debug" Class="ProjectOutput">
+                <DeployFile LocalName="ModelSupport_SSCA_ACDR\About\default.txvpck" Configuration="Debug" Class="ProjectFile">
                     <Platform Name="Win32">
-                        <RemoteName>SSCA_ACDR.exe</RemoteName>
+                        <RemoteDir>.\</RemoteDir>
                         <Overwrite>true</Overwrite>
                     </Platform>
                 </DeployFile>

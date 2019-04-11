@@ -107,9 +107,9 @@ type
     pnlHousesEnter: TPanel;
     pnlOwnersEnter: TPanel;
     dbGridHouses: TDBGrid;
-    DBGrid6: TDBGrid;
+    dbGridOwnersEnter: TDBGrid;
     pnlWelcomeEnter: TPanel;
-    DBGrid7: TDBGrid;
+    dbGridWelcomeLetters: TDBGrid;
     pnlAllGenVioLetters: TPanel;
     Label14: TLabel;
     Label15: TLabel;
@@ -138,7 +138,7 @@ type
     AdoTableGenVioLetterssignatureLine: TWideStringField;
     DataSource1: TDataSource;
     ADOTable1: TADOTable;
-    DBGrid3: TDBGrid;
+    dbGridAllAcApps: TDBGrid;
     ADOQuery1: TADOQuery;
     DataSource3: TDataSource;
     sbAppAcctSort: TSpeedButton;
@@ -232,7 +232,7 @@ type
     sbLetterType: TSpeedButton;
     tsMemo2Legal: TTabSheet;
     adoTblMemoToLegal: TADOTable;
-    DBGrid1: TDBGrid;
+    dbGridMemoToLegal: TDBGrid;
     dsMemoToLegal: TDataSource;
     dbnavMemo2Legal: TDBNavigator;
     ImageList1: TImageList;
@@ -508,11 +508,18 @@ type
     ADODataSet1: TADODataSet;
     cbEnd: TCheckBox;
     cbCurrent: TCheckBox;
-    Replica1: TReplica;
     Label11: TLabel;
     eCurrentAccNumSearch: TEdit;
     sbAccNumSort: TSpeedButton;
     AdoTableCurrentOwnersAccAccount: TIntegerField;
+    N9: TMenuItem;
+    Colors1: TMenuItem;
+    btnDrVioStatus: TButton;
+    btnOL1: TButton;
+    btnOL2: TButton;
+    btnOL3: TButton;
+    btnOL4: TButton;
+    btnOL5: TButton;
     procedure FormCreate(Sender: TObject);
     procedure ShowHint(Sender: TObject);
     procedure FileNew(Sender: TObject);
@@ -573,12 +580,12 @@ type
     procedure sbOrigLetterDateClick(Sender: TObject);
     procedure sbLetterTypeClick(Sender: TObject);
     procedure dbGridBrowseGenVioLettersCellClick(Column: TColumn);
-    procedure DBGrid3CellClick(Column: TColumn);
+    procedure dbGridAllAcAppsCellClick(Column: TColumn);
     procedure adoTblMemoToLegalNewRecord(DataSet: TDataSet);
     procedure sbAcctSort_memo2LegalClick(Sender: TObject);
     procedure sbMemoSort_memo2LegalClick(Sender: TObject);
     procedure sbVoteSort_memo2LegalClick(Sender: TObject);
-    procedure DBGrid1CellClick(Column: TColumn);
+    procedure dbGridMemoToLegalCellClick(Column: TColumn);
     procedure BuildSortAppTableQuery(IndexFieldName: string;
       PushButton: TSpeedButton);
     procedure GenerateLetterButtonClear;
@@ -664,6 +671,10 @@ type
     procedure cbCurrentClick(Sender: TObject);
     procedure sbAccNumSortClick(Sender: TObject);
     procedure eCurrentAccNumSearchChange(Sender: TObject);
+    procedure adoTblAllLettersAfterScroll(DataSet: TDataSet);
+    procedure btnDrVioStatusClick(Sender: TObject);
+    procedure dbnavViolationsClick(Sender: TObject; Button: TNavigateBtn);
+    procedure btnOL1Click(Sender: TObject);
 
   private
     procedure SortColumn(DataTable: TADOTable; IndexFieldName: string;
@@ -682,6 +693,7 @@ type
   //    PushButton: TSpeedButton); overload;
     procedure SortColumnMod(DataTable: TADOTable; IndexFieldName: string;
       PushButton: TSpeedButton); overload;
+    procedure UpdateLetterBox;
 
   end;
 
@@ -716,6 +728,8 @@ uses
 {$R *.dfm}
 
 procedure TMainForm.FormCreate(Sender: TObject);
+var
+  i, j: Integer;
 begin
   Application.OnHint := ShowHint;
   if (IniFileExists) then
@@ -750,6 +764,10 @@ begin
   end;
   menuLettersSetDefault;
   statBarUpdate;
+  for I := 0 to mainform.ComponentCount - 1 do
+  begin
+    //  Do somthing here  --->if (mainform.Components[i] ;
+  end;
 end;
 
 procedure TMainForm.ShowHint(Sender: TObject);
@@ -985,7 +1003,7 @@ end;
   This procedure is called when the user changes the CurrentAcct
   search box.
   +----------------------------------------------------------------------- }
-  procedure TMainForm.eCurrentAcctSearchChange(Sender: TObject);
+procedure TMainForm.eCurrentAcctSearchChange;
 begin
   UpdateCurrentHouseAcct('houseAcct', eCurrentAcctSearch.Text);
 end;
@@ -1059,16 +1077,19 @@ var
   numOfRecords: Integer;
 begin
   AdoTableCurrentOwners.Filtered := False;
-  AdoTableCurrentOwners.IndexFieldNames := 'Owner';
-  AdoTableCurrentOwners.Filtered := True;
+  if (sbOwnerSort.Tag = 1) then begin
+    AdoTableCurrentOwners.IndexFieldNames := 'Owner ASC';
+    sbOwnerSort.Glyph.Assign(nil);
+    ImageList1.GetBitmap(1, sbOwnerSort.Glyph);
+    sbOwnerSort.Tag := 0;
+  end else begin
+    AdoTableCurrentOwners.IndexFieldNames := 'Owner DESC';
+    sbOwnerSort.Glyph.Assign(nil);
+    ImageList1.GetBitmap(0, sbOwnerSort.Glyph);
+    sbOwnerSort.Tag := 1;
+  end;
   numOfRecords := AdoTableCurrentOwners.RecordCount;
   sbCurrentOwners.Panels[1].Text := 'Record Count: ' + IntToStr(numOfRecords);
-
-  adoTableOwners.Filtered := False;
-  adoTableOwners.IndexFieldNames := 'Owner';
-  adoTableOwners.Filtered := True;
-  numOfRecords := adoTableOwners.RecordCount;
-  sbAllOwners.Panels[1].Text := 'Record Count: ' + IntToStr(numOfRecords);
 end;
 
 procedure TMainForm.sbStrNumSortClick(Sender: TObject);
@@ -1100,7 +1121,17 @@ var
   numOfRecords: Integer;
 begin
   AdoTableCurrentOwners.Filtered := False;
-  AdoTableCurrentOwners.IndexFieldNames := 'streetName';
+  if (sbStrNameSort.Tag = 1) then  begin
+    AdoTableCurrentOwners.IndexFieldNames := 'streetName ASC';
+    sbStrNameSort.Glyph.Assign(nil);
+    ImageList1.GetBitmap(1, sbStrNameSort.Glyph);
+    sbStrNameSort.Tag := 0;
+  end  else  begin
+    AdoTableCurrentOwners.IndexFieldNames := 'streetName DESC';
+    sbStrNameSort.Glyph.Assign(nil);
+    ImageList1.GetBitmap(0, sbStrNameSort.Glyph);
+    sbStrNameSort.Tag := 1;
+  end;
   AdoTableCurrentOwners.Filtered := True;
   numOfRecords := AdoTableCurrentOwners.RecordCount;
   sbCurrentOwners.Panels[1].Text := 'Record Count: ' + IntToStr(numOfRecords);
@@ -1574,11 +1605,69 @@ begin
   statBarUpdate;
 end;
 
-{ ----------------------------------------------------------------------+
+ {----------------------------------------------------------------------+
+  btnDrVioStatusClick():
+  This procedure reads the iniFile and puts the data into the
+  date and statusBy fields.
+
+  This procedure is called when the user clicks the 'DR' button --
+  DR == Drive Report. This allows the user to manually set the date,
+  drive, and status for the data entry of Drive Reports.
+  +----------------------------------------------------------------------- }
+procedure TMainForm.btnDrVioStatusClick(Sender: TObject);
+var
+  myVioNumber: Integer;
+  statDate: TDateTime;
+  statDateIni: string;
+begin
+  statDateIni := Trim(LowerCase(ReadIniString('VioStatus\Defaults','drDate')));
+  if (statDateIni) = 'now' then
+    statDate := Date
+  else
+    statDate := StrToDate(statDateIni);
+  myVioNumber := dbGridViolations.DataSource.DataSet.FieldValues['violationID'];
+  with AdoDataSetVioStatus do
+  begin
+    Insert;
+    FieldValues['violationNumber'] := myVioNumber;
+    FieldValues['statusDate'] := statDate;
+    FieldValues['statusBy'] := ReadIniString('VioStatus\Defaults','drBy');
+    FieldValues['status'] := ReadIniString('VioStatus\Defaults','drStatus');
+  end;
+end;
+
+ {----------------------------------------------------------------------+
   btnOpenSqlClick():
   This procedure allows the user to select a SQL file for
   execution. The SQL file must be 100% self-contained.
   +----------------------------------------------------------------------- }
+procedure TMainForm.btnOL1Click(Sender: TObject);
+var
+  statDate: TDateTime;
+  statDateIni: string;
+  letterNumber: string;
+begin
+  statDateIni := Trim(LowerCase(ReadIniString('VioStatus\Defaults','OL Date')));
+  if (statDateIni) = 'now' then
+    statDate := Date
+  else
+    statDate := StrToDate(statDateIni);
+  case Tbutton(Sender).Tag of
+    1: letterNumber := ReadIniString('VioStatus\Defaults','OL1 Action');
+    2: letterNumber := ReadIniString('VioStatus\Defaults','OL2 Action');
+    3: letterNumber := ReadIniString('VioStatus\Defaults','OL3 Action');
+    4: letterNumber := ReadIniString('VioStatus\Defaults','OL4 Action');
+    5: letterNumber := ReadIniString('VioStatus\Defaults','OL5 Action');
+  end;
+  with AdoDataSetVioStatus do begin
+    Insert;
+    FieldValues['violationNumber'] := dbGridViolations.DataSource.DataSet.FieldValues['violationID'];
+    FieldValues['statusDate'] := statDate;
+    FieldValues['statusBy'] := ReadIniString('VioStatus\Defaults','OL By');
+    FieldValues['statusAction'] := letterNumber;
+  end;
+  end;
+
 procedure TMainForm.btnOpenSqlClick(Sender: TObject);
 var
   i: Integer;
@@ -1653,15 +1742,7 @@ end;
 
 procedure TMainForm.dbGridAllLettersCellClick(Column: TColumn);
 begin
-  eCurrentAcctSearch.Text := adoTblAllLetters.FieldValues['houseAcct'];
-  eCurrentAcctSearchChange(Column);
-  with RichEdit1.Lines do
-  begin
-    Clear;
-    AddStrings(DBMemo14.Lines);
-    VertScrollBar.Position := 0;
-  end;
-  statBarUpdate;
+  UpdateLetterBox;
 end;
 
 procedure TMainForm.sbVioNumClick(Sender: TObject);
@@ -1784,6 +1865,33 @@ begin
 end;
 
 
+{/* ----------------------------------------------------------------------+
+  dbnavViolationsClick():
+  This procedure is called when the user clicks the VioStatus dbNavigator.
+  The only event captured is the Insert button.
+  +----------------------------------------------------------------------- }
+procedure TMainForm.dbnavViolationsClick(Sender: TObject; Button: TNavigateBtn);
+var
+  statDate: TDateTime;
+  statDateIni: string;
+begin
+  case Button of
+    nbInsert: begin
+      statDateIni := Trim(LowerCase(ReadIniString('VioStatus\Defaults','Insert Date')));
+      if (statDateIni) = 'now' then
+        statDate := Date
+      else
+        statDate := StrToDate(statDateIni);
+      with AdoDataSetVioStatus do begin
+       // Insert;
+        FieldValues['violationNumber'] := dbGridViolations.DataSource.DataSet.FieldValues['violationID'];
+        FieldValues['statusDate'] := statDate;
+        FieldValues['statusBy'] := ReadIniString('VioStatus\Defaults','Insert By');
+        FieldValues['status'] := ReadIniString('VioStatus\Defaults','Insert Status');
+      end;
+    end;
+  end;
+end;
 
 {/* ----------------------------------------------------------------------+
   DBGrid3CellClick():
@@ -1791,9 +1899,14 @@ end;
   in the All_AC_Apps grid and copies it to the "Acct Search" TEdit
   box. It then calls the eCurrentAcctSearchChange event.
   +----------------------------------------------------------------------- }
-procedure TMainForm.DBGrid3CellClick(Column: TColumn);
+procedure TMainForm.dbGridAllAcAppsCellClick(Column: TColumn);
 begin
   UpdateCurrentHouseAcct('houseAcct', ADOQuery1.FieldValues['houseAcct']);
+end;
+
+procedure TMainForm.adoTblAllLettersAfterScroll(DataSet: TDataSet);
+begin
+  UpdateLetterBox;
 end;
 
 procedure TMainForm.adoTblBrowseGenVioLettersAfterScroll(DataSet: TDataSet);
@@ -1897,7 +2010,7 @@ begin
   SortColumn(adoTblMemoToLegal, 'votingDate', Sender as TSpeedButton);
 end;
 
-procedure TMainForm.DBGrid1CellClick(Column: TColumn);
+procedure TMainForm.dbGridMemoToLegalCellClick(Column: TColumn);
 begin
   eCurrentAcctSearch.Text := adoTblMemoToLegal.FieldValues['houseAcct'];
   eCurrentAcctSearchChange(Column);
@@ -2253,13 +2366,14 @@ procedure TMainForm.AdoDataSetVioStatusAfterInsert(DataSet: TDataSet);
 var
   myVioNumber: Integer;
 begin
-  myVioNumber := dbGridViolations.DataSource.DataSet.FieldValues['violationID'];
+ { myVioNumber := dbGridViolations.DataSource.DataSet.FieldValues['violationID'];
   with AdoDataSetVioStatus do
   begin
     FieldValues['violationNumber'] := myVioNumber;
     FieldValues['statusDate'] := Date;
     FieldValues['statusBy'] := 'BOZO';
   end;
+  }
 end;
 
 { ----------------------------------------------------------------------+
@@ -2344,18 +2458,19 @@ end;
   When the user posts a new ViolationStatus record the AdoDataSet
   has to be toggled so that the command line, that is the SQL Query,
   is executed and the record set is updated.
-  +----------------------------------------------------------------------- }
++----------------------------------------------------------------------- }
 procedure TMainForm.btnRunLettersClick(Sender: TObject);
 var
   thisLetterNum, thisLetterType: string;
   OnOffSite: string;
   sqlText: TStringList;
-  sqlDirectory, rejectType: string;
+  sqlDirectory, rejectType, miscStr: string;
   i, j, k: Integer;
 begin
-  { ----------------------------------------------------------------+
-    | Retrieve all the L_Type & L_Number                            |
-    +---------------------------------------------------------------}
+  {---------------------------------------------------------------+
+  | Retrieve all the L_Type & L_Number for all letters            |
+  |   WHERE letterDate >= Date Item in Menu                       |
+  +---------------------------------------------------------------}
   with adoQryRunLetters do
   begin
     SQL.Clear;
@@ -2370,13 +2485,15 @@ begin
   end;
   RichEdit1.Lines.Clear;
 
+  { Find the SQL directory - user may have changed the location }
   sqlDirectory := IniSqlDirectoryExists('sql\Directory','AutoFormat');
 
+  { Allocate memory for the SQL Text used in subsequent queries }
   sqlText := TStringList.Create;
 
-  { ---------------------------------------------------------------+
-    |  Run thru the letters: 1st for OnSite, then for OffSite       |
-    +--------------------------------------------------------------- }
+  {---------------------------------------------------------------+
+  |  Run thru the letters: 1st for OnSite, then for OffSite       |
+  +---------------------------------------------------------------}
   OnOffSite := 'OnSite';
   for k := 1 to 2 do
   begin
@@ -2433,8 +2550,9 @@ begin
         { Save the SQL to a local file for troubleshooting purposes }
         SQL.SaveToFile(sqlDirectory + 'ZZ_' + thisLetterType + '_' +
           thisLetterNum + '_' + OnOffSite + '.SQL');
-          Parameters.ParamByName('L_TYPE').value := thisLetterType;
-          Parameters.ParamByName('L_NUMBER').value := thisLetterNum;
+        Parameters.ParamByName('L_TYPE').value := thisLetterType;
+        Parameters.ParamByName('L_NUMBER').value := thisLetterNum;
+        Parameters.ParamByName('L_DATE').Value := DateToStr(LetterDate);
         Prepared := True;
         ExecSQL;
         { Do the next letter }
@@ -2471,7 +2589,7 @@ begin
       SQL.AddStrings(sqlText);
       { Delete the comment lines from the SQL lines }
       for j := (SQL.Count - 1) downto 0 do
-        if (AnsiLeftStr(SQL[j], 2) = '/*') then
+        if (AnsiLeftStr(Trim(SQL[j]), 2) = '/*') then
           SQL.Delete(j);
       { Save the SQL to a local file for troubleshooting purposes }
       SQL.SaveToFile(sqlDirectory + 'ZZ_' + OnOffSite + 'Approval.SQL');
@@ -2490,7 +2608,8 @@ begin
     SQL.Clear;
     SQL.Append
       ('SELECT DISTINCT ABS(permitNumber) as rejectType FROM ApprovalLetters ');
-    SQL.Append('WHERE permitNumber < 0;');
+    SQL.Append('WHERE permitNumber < 0 ');
+    SQL.Append('AND letterDate >= #' + DateToStr(LetterDate) + '#');
     ExecSQL;
     Active := True;
   end;
@@ -2504,6 +2623,7 @@ begin
       with adoQryClearLetters do
       begin
         SQL.Clear;
+        Application.ProcessMessages;
         try
           thisLetterNum := 'ACC Rejection';
           thisLetterType := adoQryRunLetters.FieldValues['rejectType'];
@@ -2516,20 +2636,21 @@ begin
           sqlText.LoadFromFile(sqlDirectory + 'Reject' + rejectType + OnOffSite
             + '.SQL');
           SQL.AddStrings(sqlText);
-          sqlText.LoadFromFile(sqlDirectory + 'Reject' + rejectType + OnOffSite +
-            'From.SQL');
+          sqlText.LoadFromFile(sqlDirectory + 'Reject' + OnOffSite + 'From.SQL');
           SQL.AddStrings(sqlText);
           { Delete the comment lines from the SQL lines }
           for j := (SQL.Count - 1) downto 0 do
-            if (AnsiLeftStr(SQL[j], 2) = '/*') then
+            if (AnsiLeftStr(Trim(SQL[j]), 2) = '/*') then
               SQL.Delete(j);
           { Save the SQL to a local file for troubleshooting purposes }
           SQL.SaveToFile(sqlDirectory + 'ZZ_' + 'Reject' + rejectType + OnOffSite
             + '.SQL');
+          Parameters.ParamByName('R_TYPE').Value := -StrToInt(rejectType);
           Prepared := True;
-          ExecSQL;
+          ExecSQL
         except
           //do something here
+          ShowMessage('Unexpected Exception in Rejection Letters');
         end;
       end; // with adoQryClearLetters
       adoQryRunLetters.Next;
@@ -2545,6 +2666,7 @@ begin
     with adoQryClearLetters do
     begin
       SQL.Clear;
+      Application.ProcessMessages;
       sqlText.LoadFromFile(sqlDirectory + 'WelcomeHeader.SQL');
       SQL.AddStrings(sqlText);
       sqlText.LoadFromFile(sqlDirectory + 'Welcome' + OnOffSite + '.SQL');
@@ -2553,7 +2675,7 @@ begin
       SQL.AddStrings(sqlText);
       { Delete the comment lines from the SQL lines }
       for j := (SQL.Count - 1) downto 0 do
-        if (AnsiLeftStr(SQL[j], 2) = '/*') then
+        if (AnsiLeftStr(Trim(SQL[j]), 2) = '/*') then
           SQL.Delete(j);
       { Save the SQL to a local file for troubleshooting purposes }
       SQL.SaveToFile(sqlDirectory + 'ZZ_' + 'Welcome' + OnOffSite + '.SQL');
@@ -2566,8 +2688,9 @@ begin
     else
       OnOffSite := 'Investor'
   end; // for k
-  // do something here
+  { De-Allocate memory for the SQL Text used in subsequent queries }
   sqlText.Free;
+  sqlText := Nil;
   { Cull the letters according to the LetterDate }
   if (LetterDate > 1) then
   begin
@@ -2578,6 +2701,7 @@ begin
     adoQryRunLetters.ExecSQL;
   end;
 
+  statBarGenLetters.Panels[4].Text := '';
   adoTblAllLetters.Active := False;
   adoTblAllLetters.Active := True;
   statBarUpdate;
@@ -3000,10 +3124,10 @@ begin
   // gutter := 30;
   margin := 5;
   Label19.Left := (pnlOwnersEnter.Width - Label19.Width) div 2;
-  DBGrid6.Left := margin;
-  DBGrid6.Height := pnlOwnersEnter.Height - DBGrid6.Top -
+  dbGridOwnersEnter.Left := margin;
+  dbGridOwnersEnter.Height := pnlOwnersEnter.Height - dbGridOwnersEnter.Top -
     sbOwners.Height - margin;
-  DBGrid6.Width := pnlOwnersEnter.Width - 2 * margin;
+  dbGridOwnersEnter.Width := pnlOwnersEnter.Width - 2 * margin;
 end;
 
 procedure TMainForm.pnlWelcomeEnterResize(Sender: TObject);
@@ -3015,9 +3139,9 @@ begin
   // gutter := 30;
   margin := 5;
   Label20.Left := (pnlWelcomeEnter.Width - Label20.Width) div 2;
-  DBGrid7.Left := margin;
-  DBGrid7.Height := pnlWelcomeEnter.Height - DBGrid7.Top - margin;
-  DBGrid7.Width := pnlWelcomeEnter.Width - 2 * margin;
+  dbGridWelcomeLetters.Left := margin;
+  dbGridWelcomeLetters.Height := pnlWelcomeEnter.Height - dbGridWelcomeLetters.Top - margin;
+  dbGridWelcomeLetters.Width := pnlWelcomeEnter.Width - 2 * margin;
   dbNavWelcome.Left := (pnlWelcomeEnter.Width - dbNavWelcome.Width) div 2;
 end;
 
@@ -3029,7 +3153,7 @@ begin
   // bottomSpacing := 10;
   // gutter := 30;
   margin := 5;
-  RichEdit1.Height := pnlGenLetters2.Height - 2 * margin;
+  RichEdit1.Height := pnlGenLetters2.Height - margin - RichEdit1.Top;
   RichEdit1.Width := pnlGenLetters2.Width - margin - RichEdit1.Left;
 
 end;
@@ -3074,11 +3198,11 @@ begin
   DBMemo18.Top := Label26.Top + Label26.Height;
   Label27.Top := DBMemo18.Top + DBMemo18.Height + memoSpacing;
   DBMemo19.Top := Label27.Top + Label27.Height;
-  DBGrid3.Left := margin;
-  DBGrid3.Width := pnlAcApps1.Width - DBGrid3.Left - memoSpacing;
+  dbGridAllAcApps.Left := margin;
+  dbGridAllAcApps.Width := pnlAcApps1.Width - dbGridAllAcApps.Left - memoSpacing;
   dbnavAllAcApps.Top := pnlAcApps1.Height - dbnavAllAcApps.Height - margin;
   dbnavAllAcApps.Left := (pnlAcApps1.Width - dbnavAllAcApps.Width) div 2;
-  DBGrid3.Height := dbnavAllAcApps.Top - memoSpacing - DBGrid3.Top;
+  dbGridAllAcApps.Height := dbnavAllAcApps.Top - memoSpacing - dbGridAllAcApps.Top;
 
 end;
 
@@ -3128,8 +3252,8 @@ begin
   // bottomSpacing := 10;
   // gutter := 30;
   margin := 5;
-  DBGrid1.Width := tsMemo2Legal.Width - 2 * margin;
-  DBGrid1.Height := tsMemo2Legal.Height - DBGrid1.Top - margin;
+  dbGridMemoToLegal.Width := tsMemo2Legal.Width - 2 * margin;
+  dbGridMemoToLegal.Height := tsMemo2Legal.Height - dbGridMemoToLegal.Top - margin;
 end;
 
 { ----------------------------------------------------------------------+
@@ -3278,6 +3402,27 @@ begin
   if (length(newHouseAcct) > 0) then
     filterText := dbField + ' = ' + newHouseAcct;
   TEditChange(filterText);
+end;
+
+
+{---------------------------------------------------------------------------
+ This procedure updates the RichEdit Box to show the letter of the
+ current record. It also updates the current owner dbGrid to the houseAcct
+ of the current record.
+ ---------------------------------------------------------------------------}
+procedure TMainForm.UpdateLetterBox;
+var
+  dummyColumn: TColumn;
+begin
+  eCurrentAcctSearch.Text := adoTblAllLetters.FieldValues['houseAcct'];
+  eCurrentAcctSearchChange(dummyColumn);
+  with RichEdit1.Lines do
+  begin
+    Clear;
+    AddStrings(DBMemo14.Lines);
+    VertScrollBar.Position := 100;
+  end;
+  statBarUpdate;
 end;
 
 procedure TMainForm.tsAllOwnersEnter(Sender: TObject);
