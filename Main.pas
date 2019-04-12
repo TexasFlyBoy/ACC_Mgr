@@ -2552,7 +2552,7 @@ begin
           thisLetterNum + '_' + OnOffSite + '.SQL');
         Parameters.ParamByName('L_TYPE').value := thisLetterType;
         Parameters.ParamByName('L_NUMBER').value := thisLetterNum;
-        Parameters.ParamByName('L_DATE').Value := DateToStr(LetterDate);
+ //       Parameters.ParamByName('L_DATE').Value := DateToStr(LetterDate);
         Prepared := True;
         ExecSQL;
         { Do the next letter }
