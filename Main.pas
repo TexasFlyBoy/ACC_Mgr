@@ -2636,7 +2636,7 @@ begin
           sqlText.LoadFromFile(sqlDirectory + 'Reject' + rejectType + OnOffSite
             + '.SQL');
           SQL.AddStrings(sqlText);
-          sqlText.LoadFromFile(sqlDirectory + 'Reject' + OnOffSite + 'From.SQL');
+          sqlText.LoadFromFile(sqlDirectory + 'Reject' + rejectType + OnOffSite + 'From.SQL');
           SQL.AddStrings(sqlText);
           { Delete the comment lines from the SQL lines }
           for j := (SQL.Count - 1) downto 0 do
@@ -2645,7 +2645,7 @@ begin
           { Save the SQL to a local file for troubleshooting purposes }
           SQL.SaveToFile(sqlDirectory + 'ZZ_' + 'Reject' + rejectType + OnOffSite
             + '.SQL');
-          Parameters.ParamByName('R_TYPE').Value := -StrToInt(rejectType);
+//          Parameters.ParamByName('R_TYPE').Value := -StrToInt(rejectType);
           Prepared := True;
           ExecSQL
         except
