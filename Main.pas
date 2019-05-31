@@ -2379,22 +2379,43 @@ end;
 { ----------------------------------------------------------------------+
   AdoDataSetViolationsAfterInsert(TDataSet):
   When the user inserts a new Violation record.
-  It copies the current HouseAcct and pastes this into the
-  new record, along with today's date.
+  It copies the current HouseAcct and pastes this into the new record.
+  Values are read from the iniFile for the remaining fields.
   +----------------------------------------------------------------------- }
 procedure TMainForm.AdoDataSetViolationsAfterInsert(DataSet: TDataSet);
 var
   myHouseAcct: Integer;
+  statDate: TDateTime;
+  statDateIni: string;
 begin
   myHouseAcct := dsCurrentOwners.DataSet.FieldValues['houseAcct'];
   with AdoDataSetViolations do
   begin
     FieldValues['houseAcct'] := myHouseAcct;
-    FieldValues['violationDate'] := Date;
-    FieldValues['startDate'] := Date;
-    FieldValues['openDate'] := Date;
-    FieldValues['reportedBy'] := 'BOZO';
-    FieldValues['Reason'] := 'Reason';
+
+    statDateIni := Trim(LowerCase(ReadIniString('Violations\Defaults','Violation Date')));
+    if (statDateIni) = 'now' then
+      statDate := Date
+    else
+      statDate := StrToDate(statDateIni);
+    FieldValues['violationDate'] := statDate;
+
+    statDateIni := Trim(LowerCase(ReadIniString('Violations\Defaults','Start Date')));
+    if (statDateIni) = 'now' then
+      statDate := Date
+    else
+      statDate := StrToDate(statDateIni);
+    FieldValues['startDate'] := statDate;
+
+    statDateIni := Trim(LowerCase(ReadIniString('Violations\Defaults','Open Date')));
+    if (statDateIni) = 'now' then
+      statDate := Date
+    else
+      statDate := StrToDate(statDateIni);
+    FieldValues['openDate'] := statDate;
+
+    FieldValues['reportedBy'] :=  ReadIniString('Violations\Defaults','Reported By');
+    FieldValues['Reason'] := ReadIniString('Violations\Defaults','Reason');
   end;
 end;
 
@@ -3323,28 +3344,33 @@ begin
   cTabColor := clBtnFace;
 
   // Color the tab the same as the Major panel
-  iTabTag := TPageControl(oControl).Pages[TabIndex].Tag;
+  iTabTag := TabIndex;  // TPageControl(oControl).Pages[TabIndex].Tag;
+
   case iTabTag of
+    0:
+      cTabColor := ReadIniInteger('Colors\Panels','pnlAcAppEnter'); // $0061AE0C
     1:
-      cTabColor := $0061AE0C;         // pnlAcAppEnter
+      cTabColor := ReadIniInteger('Colors\Panels','pnlAcApps1'); // $00F1A65A
     2:
-      cTabColor := $00F1A65A;         // pnlVioStatus
+      cTabColor := ReadIniInteger('Colors\Panels','pnlVioStatus'); // $00F1A65A
     3:
-      cTabColor := $0054C622;         // pnlWelcomeEnter
+      cTabColor := ReadIniInteger('Colors\Panels','pnlAllGenVioLetters'); // $004998E0
     4:
-      cTabColor := $004998E0;         // pnlAllGenVioLetters
+      cTabColor := ReadIniInteger('Colors\Panels','pnlWelcomeEnter'); // $0054C622
     5:
-      cTabColor := clActiveCaption;
+      cTabColor := ReadIniInteger('Colors\Panels','pnlGenLetters1'); // $00EEC29B
     6:
-      cTabColor := $0066B5BB;         // pnlLegalMatterStatus
+      cTabColor := ReadIniInteger('Colors\Panels','pnlLegalMatterStatus'); // $0066B5BB
     7:
-      cTabColor := $00EEC29B;        // pnlGenLetters1
+      cTabColor := ReadIniInteger('Colors\Panels','pnlMemoToLegal'); // $00EEC29B
     8:
-      cTabColor := $00FB5942;        // pnlMemoToLegal
+      cTabColor := ReadIniInteger('Colors\Panels','pnlAcAppEnter'); // $00FB5942
     9:
-      cTabColor := clBtnFace;
+      cTabColor := ReadIniInteger('Colors\Panels','pnlAllOwners'); // $00E68CC8
     10:
-      cTabColor := $00E68CC8;
+      cTabColor := ReadIniInteger('Colors\Panels','pnlSqlButtons'); //$00FF901E;
+    11:
+      cTabColor := ReadIniInteger('Colors\Panels','pnlAcc'); //$009C97E1;
   end;
 
   iTop := Rect.Top +

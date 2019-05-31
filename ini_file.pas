@@ -48,6 +48,9 @@ begin
     Ini.WriteFloat('Colors\Panels','pnlGenLetters2',       $00EEC29B);
     Ini.WriteFloat('Colors\Panels','pnlMemoToLegal',       $00FB5942);
     Ini.WriteFloat('Colors\Panels','pnlSqlButtons',        $00FF901E);
+    Ini.WriteFloat('Colors\Panels','pnlLegalMatterStatus', $0066B5BB);
+    Ini.WriteFloat('Colors\Panels','pnlAllOwners',         $00E68CC8);
+    Ini.WriteFloat('Colors\Panels','pnlAcc',               $009C97E1);
 
     Ini.WriteFloat('Colors','dbGridCurrentOwners',         $00B1D2B0);
     Ini.WriteFloat('Colors','AC Applications Grid',        $0097F231);
@@ -79,6 +82,12 @@ begin
     Ini.WriteString('VioStatus\Defaults','Insert Date', '10/14/1066');
     Ini.WriteString('VioStatus\Defaults','Insert By', 'goofy');
     Ini.WriteString('VioStatus\Defaults','Insert Status', 'blah');
+
+    Ini.WriteString('Violations\Defaults','Violation Date', 'Now');
+    Ini.WriteString('Violations\Defaults','Start Date', 'Now');
+    Ini.WriteString('Violations\Defaults','Open Date', 'Now');
+    Ini.WriteString('Violations\Defaults','Reported By', 'Bozo');
+    Ini.WriteString('Violations\Defaults','Reason', 'Reason');
 
     Ini.WriteString('sql\Directory','AutoFormat', '');
 

@@ -20,9 +20,9 @@ begin
   SplashScn := TSplashScn.Create(Application);
   SplashScn.Show;
   SplashScn.Update;
-  Application.CreateForm(TMainForm, MainForm);
-  Application.CreateForm(TAboutBox, AboutBox);
-  while not SplashScn.Completed do
+  AApplication.CreateForm(TMainForm, MainForm);
+  AApplication.CreateForm(TAboutBox, AboutBox);
+  ile not SplashScn.Completed do
     Application.ProcessMessages;
   SplashScn.Hide;
   SplashScn.Free;
