@@ -1865,7 +1865,7 @@ begin
 end;
 
 
-{/* ----------------------------------------------------------------------+
+{/* ----------------------------------------------------------------------+
   dbnavViolationsClick():
   This procedure is called when the user clicks the VioStatus dbNavigator.
   The only event captured is the Insert button.
@@ -2486,8 +2486,13 @@ var
   OnOffSite: string;
   sqlText: TStringList;
   sqlDirectory, rejectType, miscStr: string;
-  i, j, k: Integer;
+  i, j, k, theCurrentAcct: Integer;
 begin
+  {---------------------------------------------------------------+
+  | Save the current houseAcct in a local variable so we can show |
+  | the letter without the user having to scroll to it.           |
+  +---------------------------------------------------------------}
+  theCurrentAcct := dsCurrentOwners.DataSet.FieldByName('houseAcct').AsInteger;
   {---------------------------------------------------------------+
   | Retrieve all the L_Type & L_Number for all letters            |
   |   WHERE letterDate >= Date Item in Menu                       |
@@ -2652,26 +2657,31 @@ begin
           statBarGenLetters.Panels[4].Text := OnOffSite + ': ' + thisLetterType + ': ' + thisLetterNum;
           Application.ProcessMessages;
           rejectType := adoQryRunLetters.FieldByName('rejectType').AsString;
-          sqlText.LoadFromFile(sqlDirectory + 'ApprovalHeader.SQL');
+          miscStr := sqlDirectory + 'ApprovalHeader.SQL';
+          sqlText.LoadFromFile(miscStr);
           SQL.AddStrings(sqlText);
-          sqlText.LoadFromFile(sqlDirectory + 'Reject' + rejectType + OnOffSite
-            + '.SQL');
+
+          miscStr := sqlDirectory + 'Reject' + rejectType + OnOffSite + '.SQL';
+          sqlText.LoadFromFile(miscStr);
           SQL.AddStrings(sqlText);
-          sqlText.LoadFromFile(sqlDirectory + 'Reject' + rejectType + OnOffSite + 'From.SQL');
+
+          miscStr := sqlDirectory + 'Reject' + rejectType + OnOffSite + 'From.SQL';
+          sqlText.LoadFromFile(miscStr);
           SQL.AddStrings(sqlText);
+
           { Delete the comment lines from the SQL lines }
           for j := (SQL.Count - 1) downto 0 do
             if (AnsiLeftStr(Trim(SQL[j]), 2) = '/*') then
               SQL.Delete(j);
           { Save the SQL to a local file for troubleshooting purposes }
-          SQL.SaveToFile(sqlDirectory + 'ZZ_' + 'Reject' + rejectType + OnOffSite
-            + '.SQL');
+          miscStr := sqlDirectory + 'ZZ_' + 'Reject' + rejectType + OnOffSite + '.SQL';
+          SQL.SaveToFile(miscStr);
 //          Parameters.ParamByName('R_TYPE').Value := -StrToInt(rejectType);
           Prepared := True;
           ExecSQL
         except
           //do something here
-          ShowMessage('Unexpected Exception in Rejection Letters');
+          ShowMessage('Unexpected Exception in Rejection Letters. File Name: '+ miscStr);
         end;
       end; // with adoQryClearLetters
       adoQryRunLetters.Next;
@@ -2728,6 +2738,20 @@ begin
   statBarUpdate;
   RichEdit1.Lines.AddStrings(DBMemo14.Lines);
 
+  { Find the first record with the Current houseAcct }
+  adoTblAllLetters.First;
+  j := adoTblAllLetters.RecordCount;
+  if (j >50) then Exit;
+  for i:= 0 to j do
+  begin
+    if (adoTblAllLetters.FieldByName('houseAcct').AsInteger = theCurrentAcct) then
+    begin
+      exit;
+    end;
+    adoTblAllLetters.Next;
+  end;
+  adoTblAllLetters.First;
+  RichEdit1.Lines.AddStrings(DBMemo14.Lines);
 end;
 
 procedure TMainForm.btnRunSqlClick(Sender: TObject);
@@ -2824,7 +2848,7 @@ begin
     recordNumber := 0
   end;
   statBarGenLetters.Panels[1].Text := 'Total Letters: ' + IntToStr(RecordCount);
-  statBarGenLetters.Panels[2].Text := 'Record #: ' + IntToStr(recordNumber);
+  statBarGenLetters.Panels[2].Text := 'Record # ' + IntToStr(recordNumber);
   statBarGenLetters.Panels[3].Text := 'Letter Date >= ' + DateToStr(LetterDate);
 end;
 
